@@ -25,6 +25,7 @@ class _SignInState extends State<SignIn> {
   final _focusPassword = FocusNode();
 
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -34,10 +35,64 @@ class _SignInState extends State<SignIn> {
 
   @override
   void _handleLogin() async {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => const OtpScreen())); //OtpScreen MainLayout
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (phone.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final url = Uri.parse('https://members.washlover.com/api/auth/token');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'phone': phone,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['token'] != null) {
+          final token = data['token'];
+
+          // เก็บ token
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('เข้าสู่ระบบสำเร็จ')),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MainLayout()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('ไม่พบ token ใน response')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('เกิดข้อผิดพลาด: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   void _togglePasswordVisibility() {
