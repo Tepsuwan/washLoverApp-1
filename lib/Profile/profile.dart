@@ -3,6 +3,8 @@ import 'dart:io';
 // ignore: depend_on_referenced_packages
 import 'package:image_picker/image_picker.dart';
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
+import 'package:my_flutter_mapwash/Login/login_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class profile extends StatelessWidget {
   const profile({super.key});
@@ -103,6 +105,20 @@ class profile extends StatelessWidget {
               text: "บัตรเครดิต / เดบิต",
               onTap: () {},
             ),
+            buildMenuLogout(
+              icon: Icons.logout_rounded,
+              text: "ออกจากระบบ",
+              onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginPage()),
+                  (route) => false,
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -121,6 +137,33 @@ class profile extends StatelessWidget {
         leading: Icon(icon, color: Colors.blue.shade800),
         title: Text(text, style: const TextStyle(fontSize: 16)),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget buildMenuLogout({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+      color: Colors.white,
+      child: ListTile(
+        leading: Icon(icon, color: Colors.red),
+        title: Text(
+          text,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.red,
+          ),
+        ),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.red,
+        ),
         onTap: onTap,
       ),
     );

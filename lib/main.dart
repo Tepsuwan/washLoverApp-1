@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:my_flutter_mapwash/Layouts/main_layout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_flutter_mapwash/Login/login_page.dart';
+import 'package:my_flutter_mapwash/api_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    api_config.loadEndpoint();
     _checkLogin();
   }
 
@@ -31,10 +33,11 @@ class _MyAppState extends State<MyApp> {
     final token = prefs.getString('token');
     final phone = prefs.getString('phone');
     final password = prefs.getString('password');
+    final endpoint = prefs.getString('endpoint');
 
     if (token != null && phone != null && password != null) {
       try {
-        final url = Uri.parse('https://members.washlover.com/api/auth/token');
+        final url = Uri.parse('$endpoint/api/auth/token');
         final response = await http.post(
           url,
           headers: {'Content-Type': 'application/json'},
@@ -43,7 +46,7 @@ class _MyAppState extends State<MyApp> {
             'password': password,
           }),
         );
-
+        print('prefs: $prefs');
         if (response.statusCode == 200) {
           // ✅ login สำเร็จ → ไปหน้า MainLayout
           setState(() {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // สำหรับแปลง JSON เป็น Dart
+import 'package:my_flutter_mapwash/Home/API/api_history.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class History extends StatefulWidget {
   @override
@@ -14,29 +14,37 @@ class _HistoryState extends State<History> {
   static const Color lightBlue = Color(0xFFE8F1FF);
   static const Color primaryBlue = Color(0xFF1E62F9);
 
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
   List<dynamic> _historyData = [
-    {
-      'date': '2025-10-15',
-      'time': '14:30',
-      'status': 'completed',
-      'price_net': 150.75,
-      // 'phone': '0812345678',
-    },
-    {
-      'date': '2025-10-14',
-      'time': '09:45',
-      'status': 'pending',
-      'price_net': 200.00,
-      // 'phone': '0898765432',
-    },
-    {
-      'date': '2025-10-13',
-      'time': '18:15',
-      'status': 'cancelled',
-      'price_net': 0.0,
-      // 'phone': '0865432190',
-    },
+    // {
+    //   'date': '2025-10-15',
+    //   'time': '14:30',
+    //   'status': 'completed',
+    //   'price_net': 150.75,
+    //   // 'phone': '0812345678',
+    // },
   ];
+  Future<void> _loadHistory() async {
+    try {
+      List<dynamic> data = await api_history.fetchHistory();
+
+      setState(() {
+        if (data.isNotEmpty) {
+          _historyData = data; // มีข้อมูล → แสดงเลย
+        } else {
+          _historyData = []; // ไม่มีข้อมูล → แสดงว่าไม่มีประวัติ
+        }
+      });
+    } catch (e) {
+      print('Error loading history: $e');
+      setState(() => _historyData = []);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,11 +128,12 @@ class _HistoryState extends State<History> {
                           itemCount: _historyData.length,
                           itemBuilder: (context, index) {
                             var item = _historyData[index];
-                            String date = item['date'] ?? '-';
-                            String time = item['time'] ?? '-';
-                            String status = item['status'] ?? '-';
+                            String date = item['set_at'] ?? '-';
+                            String time = item['started_at'] ?? '-';
+                            String status = (item['status'] ?? '').toString();
+
                             // String phone = item['phone'] ?? '-';
-                            double price = item['price_net'] ?? 0.0;
+                            String price = item['duration_str'] ?? 0.0;
                             return Container(
                               margin: const EdgeInsets.only(bottom: 12),
                               padding: const EdgeInsets.symmetric(
@@ -178,7 +187,8 @@ class _HistoryState extends State<History> {
                                           formatThaiDate(date, time),
                                           style: const TextStyle(
                                             fontSize: 16,
-                                            color: Color.fromARGB(255, 80, 80, 80),
+                                            color:
+                                                Color.fromARGB(255, 80, 80, 80),
                                           ),
                                         ),
                                         const SizedBox(height: 3),
@@ -215,7 +225,7 @@ class _HistoryState extends State<History> {
 
                                   ////////////////////////////////////////// ราคา //////////////////////////////////////////
                                   Text(
-                                    '฿${price.toStringAsFixed(2)}',
+                                    '฿${price}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 18,
@@ -350,10 +360,8 @@ class _HistoryState extends State<History> {
                         children: [
                           Transform.rotate(
                             angle: 0.5, // หมุนไปทางขวาเล็กน้อย
-                            child: Image.asset(
-                                'assets/images/duck.png',
-                                width: 80,
-                                height: 40),
+                            child: Image.asset('assets/images/duck.png',
+                                width: 80, height: 40),
                           ),
                           const SizedBox(height: 4),
                           const Text(
@@ -603,11 +611,11 @@ class _HistoryState extends State<History> {
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'completed':
+      case '4':
         return Colors.green;
-      case 'pending':
+      case '3':
         return Colors.orange;
-      case 'cancelled':
+      case '2':
         return Colors.red;
       default:
         return Colors.grey;
@@ -616,11 +624,11 @@ class _HistoryState extends State<History> {
 
   String _getStatusText(String status) {
     switch (status.toLowerCase()) {
-      case 'completed':
+      case '4':
         return 'สำเร็จ';
-      case 'pending':
+      case '3':
         return 'กำลังดำเนินการ';
-      case 'cancelled':
+      case '2':
         return 'ไม่สำเร็จ';
       default:
         return status;
