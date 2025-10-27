@@ -4,10 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:my_flutter_mapwash/Layouts/main_layout.dart';
 import 'package:my_flutter_mapwash/theme.dart';
-import 'package:my_flutter_mapwash/Header/snackbar.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -59,7 +57,8 @@ class _SignUpState extends State<SignUp> {
     });
   }
 
-  Widget _divider() => Container(width: 250.0, height: 1.0, color: Colors.grey[400]);
+  Widget _divider() =>
+      Container(width: 250.0, height: 1.0, color: Colors.grey[400]);
 
   Widget _buildTextField({
     required String hint,
@@ -91,7 +90,8 @@ class _SignUpState extends State<SignUp> {
           border: InputBorder.none,
           icon: Icon(icon, color: Colors.blue),
           hintText: hint,
-          hintStyle: const TextStyle(fontFamily: 'WorkSansSemiBold', fontSize: 16.0),
+          hintStyle:
+              const TextStyle(fontFamily: 'WorkSansSemiBold', fontSize: 16.0),
           suffixIcon: toggleObscure != null
               ? GestureDetector(
                   onTap: toggleObscure,
@@ -127,19 +127,24 @@ class _SignUpState extends State<SignUp> {
         confirm.isEmpty ||
         password.length != 6 ||
         password != confirm) {
-      _showDialog("ผิดพลาด", "กรุณาระบุข้อมูลให้ครบถ้วน และ PINN ต้องมีความยาว 6 ตัว");
+      _showDialog(
+          "ผิดพลาด", "กรุณาระบุข้อมูลให้ครบถ้วน และ PINN ต้องมีความยาว 6 ตัว");
       return;
     }
 
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final endpoint = prefs.getString('endpoint');
+
+      print(endpoint);
       final response = await http.post(
-        Uri.parse("https://washlover.com/api/register"),
+        Uri.parse("${endpoint}/api/register"),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           "phone": phone,
           "nickname": name,
           "password": password,
-          "affiliate": affiliate,
+          // "affiliate": affiliate,
         }),
       );
 
@@ -147,11 +152,11 @@ class _SignUpState extends State<SignUp> {
       if (data['status'] == 'error') {
         _showDialog("ผิดพลาด", data['msg'] ?? "เกิดข้อผิดพลาดบางประการ");
       } else {
-        final prefs = await SharedPreferences.getInstance();
         await prefs.setString('phone', phone);
         await prefs.setString('name', name);
         await prefs.setString('password', password);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainLayout()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const MainLayout()));
       }
     } catch (e) {
       _showDialog("ผิดพลาด", "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -164,7 +169,10 @@ class _SignUpState extends State<SignUp> {
       builder: (_) => AlertDialog(
         title: Text(title),
         content: Text(content),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context), child: const Text("OK"))
+        ],
       ),
     );
   }
@@ -184,14 +192,15 @@ class _SignUpState extends State<SignUp> {
                   Card(
                     elevation: 2.0,
                     color: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0)),
                     child: Container(
                       width: 300.0,
                       child: Column(
                         children: [
                           _buildTextField(
                             hint: 'ชื่อเล่น',
-                            icon: FontAwesomeIcons.userLarge,
+                            icon: FontAwesomeIcons.user,
                             controller: _nameController,
                             focusNode: _focusName,
                             nextFocus: _focusPhone,
@@ -203,7 +212,9 @@ class _SignUpState extends State<SignUp> {
                             controller: _phoneController,
                             focusNode: _focusPhone,
                             nextFocus: _focusPassword,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
                           ),
                           _divider(),
                           _buildTextField(
@@ -214,7 +225,9 @@ class _SignUpState extends State<SignUp> {
                             nextFocus: _focusConfirm,
                             obscure: _obscurePassword,
                             toggleObscure: _toggleObscurePassword,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
                           ),
                           _divider(),
                           _buildTextField(
@@ -224,17 +237,21 @@ class _SignUpState extends State<SignUp> {
                             focusNode: _focusConfirm,
                             obscure: _obscureConfirm,
                             toggleObscure: _toggleObscureConfirm,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
                             textInputAction: TextInputAction.go,
                             onSubmit: _submit,
                           ),
                           _divider(),
                           _buildTextField(
-                            hint: 'เพื่อนแนะนำ (เบอร์โทรศัพท์)',
+                            hint: 'เพื่อนแนะนำ ( CODE )',
                             icon: FontAwesomeIcons.userGroup,
                             controller: _affiliateController,
                             focusNode: FocusNode(),
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
                             textInputAction: TextInputAction.done,
                           ),
                         ],
@@ -246,21 +263,31 @@ class _SignUpState extends State<SignUp> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5.0),
                       gradient: const LinearGradient(
-                        colors: [CustomTheme.loginGradientEnd, CustomTheme.loginGradientStart],
+                        colors: [
+                          CustomTheme.loginGradientEnd,
+                          CustomTheme.loginGradientStart
+                        ],
                         begin: FractionalOffset(0.2, 0.2),
                         end: FractionalOffset(1.0, 1.0),
                         stops: [0.0, 1.0],
                         tileMode: TileMode.clamp,
                       ),
                       boxShadow: const [
-                        BoxShadow(color: CustomTheme.loginGradientStart, offset: Offset(1.0, 6.0), blurRadius: 20.0),
-                        BoxShadow(color: CustomTheme.loginGradientEnd, offset: Offset(1.0, 6.0), blurRadius: 20.0),
+                        BoxShadow(
+                            color: CustomTheme.loginGradientStart,
+                            offset: Offset(1.0, 6.0),
+                            blurRadius: 20.0),
+                        BoxShadow(
+                            color: CustomTheme.loginGradientEnd,
+                            offset: Offset(1.0, 6.0),
+                            blurRadius: 20.0),
                       ],
                     ),
                     child: MaterialButton(
                       highlightColor: Colors.transparent,
                       splashColor: CustomTheme.loginGradientEnd,
-                      padding: const EdgeInsets.symmetric(horizontal: 42.0, vertical: 10.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 42.0, vertical: 10.0),
                       onPressed: _submit,
                       child: const Text(
                         'SIGN UP',

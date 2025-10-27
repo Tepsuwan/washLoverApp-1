@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class api_config {
   static String endpoint = ''; // ค่าเริ่มต้น
-
   /// โหลด endpoint จาก cache หรือ server
   static Future<void> loadEndpoint() async {
     final prefs = await SharedPreferences.getInstance();
