@@ -37,7 +37,6 @@ class _SignInState extends State<SignIn> {
   void _handleLogin() async {
     final phone = _phoneController.text.trim();
     final password = _passwordController.text.trim();
-
     if (phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
@@ -60,18 +59,17 @@ class _SignInState extends State<SignIn> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
         if (data['token'] != null) {
           final token = data['token'];
-
           // เก็บ token
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
-
+          await prefs.setString('phone', phone);
+          await prefs.setString('password', password);
+          print('token: $token');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('เข้าสู่ระบบสำเร็จ')),
           );
-
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const MainLayout()),
