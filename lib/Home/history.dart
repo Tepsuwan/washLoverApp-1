@@ -22,7 +22,7 @@ class _HistoryState extends State<History> {
 
   List<dynamic> _historyData = [
     // {
-    //   'date': '2025-10-15', 
+    //   'date': '2025-10-15',
     //   'time': '14:30',
     //   'status': 'completed',
     //   'price_net': 150.75,
@@ -186,7 +186,7 @@ class _HistoryState extends State<History> {
                                         Text(
                                           formatThaiDate(date, time),
                                           style: const TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 14,
                                             color:
                                                 Color.fromARGB(255, 80, 80, 80),
                                           ),
@@ -431,15 +431,25 @@ class _HistoryState extends State<History> {
     ];
 
     try {
-      final dt = DateTime.parse('$date $time');
+      // ✅ กรณี date เป็นรูปแบบ ISO เช่น 2025-10-24T18:45:00Z
+      String dateTimeString;
+      if (date.contains('T')) {
+        dateTimeString = date;
+      } else {
+        dateTimeString = time.isNotEmpty ? '$date $time' : date;
+      }
+
+      DateTime dt = DateTime.parse(dateTimeString).toLocal();
+
       final buddhistYear = dt.year + 543;
       final thaiMonth = monthsThai[dt.month - 1];
       final formattedTime =
           '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 
-      return '${dt.day} $thaiMonth $buddhistYear เวลา $formattedTime';
+      return '${dt.day} $thaiMonth $buddhistYear $formattedTime น.';
     } catch (e) {
-      return '$date $time'; // fallback
+      // ถ้า parse ไม่ได้ให้ส่งคืนแบบเดิม
+      return '$date ${time ?? ''}'.trim();
     }
   }
 
