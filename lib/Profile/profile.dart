@@ -5,9 +5,40 @@ import 'package:image_picker/image_picker.dart';
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
 import 'package:my_flutter_mapwash/Login/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_flutter_mapwash/Profile/API/api_profile.dart'; // ✅ เพิ่ม import เพื่อเรียก API
 
-class profile extends StatelessWidget {
+class profile extends StatefulWidget {
   const profile({super.key});
+
+  @override
+  State<profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<profile> {
+  Map<String, dynamic>? profileData;
+  bool isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    loadProfile();
+  }
+
+  Future<void> loadProfile() async {
+    try {
+      final data = await fetchProfile();
+      setState(() {
+        profileData = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,108 +50,125 @@ class profile extends StatelessWidget {
           Navigator.pop(context);
         },
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              // color: Colors.blue.shade800,
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle, // ทำให้เป็นวงกลม
-                      border: Border.all(
-                        color: Colors.grey, // สีของขอบ
-                        width: 2, // ความหนาของขอบ
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      radius: 35,
-                      backgroundImage: AssetImage("assets/images/duck2.jpg"),
-                    ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage != null
+              ? Center(
+                  child: Text(
+                    'เกิดข้อผิดพลาด: $errorMessage',
+                    style: const TextStyle(color: Colors.red),
                   ),
-                  const SizedBox(width: 15),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        "สมชาย ใจดี",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "081 **** 123",
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // เมนูต่างๆ
-            buildMenuItem(
-              icon: Icons.person,
-              text: "ข้อมูลส่วนตัว",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const EditProfilePage(),
-                  ),
-                );
-              },
-            ),
-            buildMenuItem(
-              icon: Icons.link,
-              text: "เชื่อมต่อบัญชี LINE",
-              onTap: () {},
-            ),
-            buildMenuItem(
-              icon: Icons.account_balance_wallet,
-              text: "วอลเล็ท (0 บาท)",
-              onTap: () {},
-            ),
-            buildMenuItem(
-              icon: Icons.star,
-              text: "แต้มสะสม (120 คะแนน)",
-              onTap: () {},
-            ),
-            buildMenuItem(
-              icon: Icons.location_on,
-              text: "ที่อยู่ของฉัน",
-              onTap: () {},
-            ),
-            buildMenuItem(
-              icon: Icons.confirmation_num,
-              text: "คูปอง (2 คูปอง)",
-              onTap: () {},
-            ),
-            buildMenuItem(
-              icon: Icons.credit_card,
-              text: "บัตรเครดิต / เดบิต",
-              onTap: () {},
-            ),
-            buildMenuLogout(
-              icon: Icons.logout_rounded,
-              text: "ออกจากระบบ",
-              onTap: () async {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.clear();
+                )
+              : buildProfileContent(context),
+    );
+  }
 
+  Widget buildProfileContent(BuildContext context) {
+    final data = profileData!;
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.grey, width: 2),
+                  ),
+                  child: const CircleAvatar(
+                    radius: 35,
+                    backgroundImage: AssetImage("assets/images/duck2.jpg"),
+                  ),
+                ),
+                const SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data['nickname'] ?? 'ไม่พบชื่อเล่น',
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      data['phone'] ?? '-',
+                      style: const TextStyle(color: Colors.blue),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // เมนูต่างๆ
+          buildMenuItem(
+            icon: Icons.person,
+            text: "ข้อมูลส่วนตัว",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfilePage(
+                    nickname: data['nickname'] ?? '',
+                    phone: data['phone'] ?? '',
+                  ),
+                ),
+              );
+            },
+          ),
+          buildMenuItem(
+            icon: Icons.link,
+            text: "เชื่อมต่อบัญชี LINE",
+            onTap: () {},
+          ),
+          buildMenuItem(
+            icon: Icons.account_balance_wallet,
+            text: "วอลเล็ท (${data['balance'] ?? 0} บาท)",
+            onTap: () {},
+          ),
+          buildMenuItem(
+            icon: Icons.star,
+            text: "แต้มสะสม (${data['points'] ?? 0} คะแนน)",
+            onTap: () {},
+          ),
+          buildMenuItem(
+            icon: Icons.local_laundry_service,
+            text:
+                "จำนวนครั้งที่ใช้บริการ (${data['service_count'] ?? 0} ครั้ง)",
+            onTap: () {},
+          ),
+          buildMenuItem(
+            icon: Icons.access_time,
+            text: "ใช้งานล่าสุด: ${data['last_active'] ?? '-'}",
+            onTap: () {},
+          ),
+          buildMenuItem(
+            icon: Icons.perm_identity,
+            text: "รหัสอุปกรณ์: ${data['device_id'] ?? '-'}",
+            onTap: () {},
+          ),
+          buildMenuLogout(
+            icon: Icons.logout_rounded,
+            text: "ออกจากระบบ",
+            onTap: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.clear();
+
+              if (context.mounted) {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => LoginPage()),
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
                   (route) => false,
                 );
-              },
-            ),
-          ],
-        ),
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -132,7 +180,7 @@ class profile extends StatelessWidget {
   }) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-      color: Colors.white, // กำหนดสีพื้นหลังให้เป็นสีขาว
+      color: Colors.white,
       child: ListTile(
         leading: Icon(icon, color: Colors.blue.shade800),
         title: Text(text, style: const TextStyle(fontSize: 16)),
@@ -154,16 +202,10 @@ class profile extends StatelessWidget {
         leading: Icon(icon, color: Colors.red),
         title: Text(
           text,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.red,
-          ),
+          style: const TextStyle(fontSize: 16, color: Colors.red),
         ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: Colors.red,
-        ),
+        trailing:
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.red),
         onTap: onTap,
       ),
     );
@@ -172,7 +214,14 @@ class profile extends StatelessWidget {
 
 // ---------------- หน้าแก้ไขโปรไฟล์ ----------------
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+  final String nickname;
+  final String phone;
+
+  const EditProfilePage({
+    super.key,
+    required this.nickname,
+    required this.phone,
+  });
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -182,6 +231,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   File? _image;
   final picker = ImagePicker();
 
+  late TextEditingController nicknameController;
+  late TextEditingController emailController;
+
   Future getImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
@@ -189,6 +241,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _image = File(pickedFile.path);
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    nicknameController = TextEditingController(text: widget.nickname);
+    emailController = TextEditingController();
   }
 
   @override
@@ -229,10 +288,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ],
             ),
             const SizedBox(height: 20),
-            buildTextField("ชื่อ", "สมชาย"),
-            buildTextField("นามสกุล", "ใจดี"),
-            buildTextField("เบอร์โทรศัพท์", "081 **** 123", enabled: false),
-            buildTextField("อีเมล", "somchai.test@example.com"),
+            buildTextField("ชื่อเล่น", widget.nickname),
+            buildTextField("เบอร์โทรศัพท์", widget.phone, enabled: false),
+            buildTextField("อีเมล", "example@email.com"),
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -242,7 +300,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("ยังไม่เชื่อมต่อ API บันทึก")),
+                );
+              },
               child: const Text(
                 "บันทึก",
                 style: TextStyle(
@@ -266,8 +328,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           labelText: label,
           hintText: value,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          fillColor: Colors.white, // สีพื้นหลัง
-          filled: true, // เปิดใช้งานสีพื้นหลัง
+          fillColor: Colors.white,
+          filled: true,
         ),
       ),
     );
