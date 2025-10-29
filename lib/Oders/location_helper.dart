@@ -6,18 +6,14 @@ class location_helper {
   static Future<Map<String, dynamic>?> getCurrentLocationUser() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
-      print("Current permission1: $permission");
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        print("🚫 Permission denied or denied forever.");
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied ||
             permission == LocationPermission.deniedForever) {
-          print("🚫 Permission denied permanently or denied.");
           return null;
         }
       }
-      print("🔐 Permission: $permission");
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.low,
       );

@@ -35,6 +35,12 @@ class _MyAppState extends State<MyApp> {
     final password = prefs.getString('password');
     final endpoint = prefs.getString('endpoint');
 
+    double currentLat = 13.7563;
+    double currentLng = 100.5018;
+
+    await prefs.setDouble('lat', currentLat);
+    await prefs.setDouble('lng', currentLng);
+
     if (token != null && phone != null && password != null) {
       try {
         final url = Uri.parse('$endpoint/api/auth/token');
@@ -46,15 +52,12 @@ class _MyAppState extends State<MyApp> {
             'password': password,
           }),
         );
-        print('prefs: $prefs');
         if (response.statusCode == 200) {
-          // ✅ login สำเร็จ → ไปหน้า MainLayout
           setState(() {
             _startScreen = const MainLayout();
           });
           return;
         } else {
-          // ❌ login ไม่สำเร็จ → ลบข้อมูลเก่าออก
           await prefs.clear();
         }
       } catch (e) {
@@ -62,7 +65,6 @@ class _MyAppState extends State<MyApp> {
       }
     }
 
-    // ถ้าไม่มีข้อมูล หรือ login ล้มเหลว → ไปหน้า LoginPage
     setState(() {
       _startScreen = LoginPage();
     });

@@ -19,9 +19,7 @@ class Qrcode extends StatefulWidget {
   _QrcodeState createState() => _QrcodeState();
 }
 
-const List<Color> _kDefaultRainbowColors = const [
-  Colors.blue,
-];
+
 
 class _QrcodeState extends State<Qrcode> {
   String displayMessageStatus = "กำลังดำเนินการ";
@@ -50,7 +48,6 @@ class _QrcodeState extends State<Qrcode> {
   @override
   void initState() {
     super.initState();
-    fetchQrcode();
     _startCountdown();
   }
 
@@ -76,58 +73,6 @@ class _QrcodeState extends State<Qrcode> {
     super.dispose();
   }
 
-  _showSingleAnimationDialog(Indicator indicator, bool showPathBackground) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          fullscreenDialog: false,
-          builder: (ctx) {
-            return Scaffold(
-              body: Padding(
-                padding: const EdgeInsets.all(64),
-                child: Center(
-                  child: LoadingIndicator(
-                    indicatorType: indicator,
-                    colors: _kDefaultRainbowColors,
-                    strokeWidth: 4.0,
-                    pathBackgroundColor:
-                        showPathBackground ? Colors.black45 : null,
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      );
-    });
-  }
-
-  Future<void> saveUserData(String idWorking) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('idWorking', idWorking);
-  }
-
-  Future<void> SaveSPFID(String SPFID) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('SPFID', SPFID);
-  }
-
-  Future<String?> convertedSelectedOptions() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('convertedSelectedOptions');
-  }
-
-  Future<void> removeConvertedSelectedOptions() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('convertedSelectedOptions');
-  }
-
-  Future<String?> _getPhonePreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('phone');
-  }
-
   String _generateRandomString(int length) {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     const digits = '0123456789';
@@ -146,138 +91,6 @@ class _QrcodeState extends State<Qrcode> {
   Future<String?> GetSPFID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('SPFID');
-  }
-
-  Future<void> ConfirmOrder(
-    String idWorking,
-    String amount,
-    String detail,
-    String username,
-    String image,
-    List<Map<String, dynamic>> addressuser,
-    List<Map<String, dynamic>> addressBranch,
-    String promotionPrice,
-    String payment,
-    BuildContext context,
-  ) async {
-    if (idWorking == '') {
-      return;
-    }
-    print('coupon received in ConfirmOrder: $promotionPrice');
-    saveUserData(idWorking);
-    double value = double.tryParse(amount) ?? 0.0;
-    if (value < 0) value = 0;
-
-// 3) แปลงกลับเป็น String (ถ้าอยากทศนิยม 2 ตำแหน่ง ใช้ toStringAsFixed(2))
-    amount = value.toStringAsFixed(2);
-    String date = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? phone = prefs.getString('phone');
-    String? nickName = prefs.getString('name');
-    String? converted = await convertedSelectedOptions();
-    List<dynamic> loadedData = jsonDecode(converted!);
-    List<Map<String, dynamic>> items = [];
-    String? noteData;
-
-    if (loadedData.isNotEmpty) {
-      var firstItem = loadedData[0];
-      if (firstItem['items'] != null) {
-        items = List<Map<String, dynamic>>.from(firstItem['items']);
-      }
-
-      if (loadedData.length > 1) {
-        var secondItem = loadedData[1];
-        noteData = secondItem['note'] ?? '';
-      }
-    }
-    if (payment == 'credit') {
-      final response = await http.put(
-        Uri.parse(
-            'https://android-dcbef-default-rtdb.firebaseio.com/order/$username/WL$idWorking.json'),
-        body: json.encode({
-          'user_location': {
-            'address': addressuser[0]['address'],
-            'latitude': addressuser[0]['latitude'],
-            'longitude': addressuser[0]['longitude'],
-            'name': addressuser[0]['name'],
-            'detail': addressuser[0]['detail'],
-            'phone': addressuser[0]['phone'],
-            'note': addressuser[0]['note'],
-            'subdistrict': addressuser[0]['subdistrict'],
-            'district': addressuser[0]['district'],
-            'province': addressuser[0]['province'],
-            'postcode': addressuser[0]['postcode'],
-          },
-          'note': noteData ?? '',
-          'datetime': date,
-          'code': 'WL$idWorking',
-          'price_sum': amount,
-          'price_discount': promotionPrice,
-          'image': 'https://washlover.com/image/logo.png?v=6',
-          'name': nickName,
-          'status': 'pending',
-          'phone': phone,
-          'branch': {
-            'code': addressBranch[0]['code'],
-            'address': addressBranch[0]['address'],
-            'latitude': addressBranch[0]['latitude'],
-            'longitude': addressBranch[0]['longitude'],
-            'branch': addressBranch[0]['branch'],
-            'name': addressBranch[0]['closestBranch'],
-          },
-          'oder_selects': items,
-        }),
-      );
-      if (response.statusCode == 200) {
-        await Future.delayed(Duration(seconds: 2));
-      } else {
-        throw Exception('Failed to add data');
-      }
-    }
-  }
-
-  Future<void> fetchQrcode() async {
-    String getCurrent() {
-      DateTime now = DateTime.now();
-      String year = now.year.toString().substring(3);
-      String month = now.month.toString().padLeft(2, '0');
-      String day = now.day.toString().padLeft(2, '0');
-      String minute = now.minute.toString().padLeft(2, '0');
-      String second = now.second.toString().padLeft(2, '0');
-      String randomString = _generateRandomString(5);
-      String formattedDate =
-          year + month + day + minute + second + randomString;
-
-      return formattedDate;
-    }
-
-    username = await _getPhonePreferences() ?? "";
-    if (username.isEmpty) {
-      print("ไม่พบ username");
-      return;
-    }
-    String randomDate = getCurrent();
-    idWorking = randomDate;
-    final arguments =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    final totalPrice = arguments['totalPrice'];
-    final address = arguments['address'];
-    final addressBranch = arguments['addressBranch'];
-    final coupon = arguments['coupon'];
-    final payMent = arguments['payment'];
-    promotionPrice = coupon.toString();
-    addressuser = address;
-    amount = totalPrice;
-    Branch = addressBranch;
-    String IDWORK = await GetSPFID() ?? "";
-    setState(() {
-      ID = IDWORK;
-      detail = idWorking;
-      ref = 'credit';
-    });
-    print('payCheck : $payMent');
-    ConfirmOrder(idWorking, amount, detail, username, image, addressuser,
-        Branch, promotionPrice, payMent, context);
   }
 
   String _formatTime(int seconds) {

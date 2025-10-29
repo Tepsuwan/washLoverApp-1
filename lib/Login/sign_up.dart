@@ -121,24 +121,35 @@ class _SignUpState extends State<SignUp> {
     final confirm = _confirmPasswordController.text.trim();
     final affiliate = _affiliateController.text.trim();
 
-    if (name.isEmpty ||
-        phone.isEmpty ||
-        password.isEmpty ||
-        confirm.isEmpty ||
-        password.length != 6 ||
-        password != confirm) {
-      _showDialog(
-          "ผิดพลาด", "กรุณาระบุข้อมูลให้ครบถ้วน และ PINN ต้องมีความยาว 6 ตัว");
+    // ✅ ตรวจสอบข้อมูลให้ครบ
+    if (phone.isEmpty || name.isEmpty || password.isEmpty || confirm.isEmpty) {
+      _showDialog("ผิดพลาด", "กรุณาระบุข้อมูลให้ครบถ้วน");
+      return;
+    }
+
+    // ✅ ตรวจสอบความยาวรหัสผ่าน
+    if (password.length != 6) {
+      _showDialog("ผิดพลาด", "PIN ต้องมีความยาว 6 ตัว");
+      return;
+    }
+
+    // ✅ ตรวจสอบว่ารหัสผ่านตรงกัน
+    if (password != confirm) {
+      _showDialog("ผิดพลาด", "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน");
       return;
     }
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final endpoint = prefs.getString('endpoint');
+      final endpoint = prefs.getString('endpoint') ?? "";
 
-      print(endpoint);
+      if (endpoint.isEmpty) {
+        _showDialog("ผิดพลาด", "ไม่พบ Endpoint ในระบบ");
+        return;
+      }
+
       final response = await http.post(
-        Uri.parse("${endpoint}/api/register"),
+        Uri.parse("$endpoint/api/register"),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           "phone": phone,
@@ -148,6 +159,8 @@ class _SignUpState extends State<SignUp> {
         }),
       );
 
+      print(response.statusCode);
+
       final data = jsonDecode(response.body);
       if (data['status'] == 'error') {
         _showDialog("ผิดพลาด", data['msg'] ?? "เกิดข้อผิดพลาดบางประการ");
@@ -156,10 +169,13 @@ class _SignUpState extends State<SignUp> {
         await prefs.setString('name', name);
         await prefs.setString('password', password);
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const MainLayout()));
+          context,
+          MaterialPageRoute(builder: (_) => const MainLayout()),
+        );
       }
     } catch (e) {
       _showDialog("ผิดพลาด", "เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      print(e);
     }
   }
 

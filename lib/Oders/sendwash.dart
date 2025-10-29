@@ -6,11 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:my_flutter_mapwash/Oders/API/api_sendwash.dart';
 import 'package:my_flutter_mapwash/Oders/address_user.dart';
 import 'package:my_flutter_mapwash/Oders/location_helper.dart';
-import 'package:my_flutter_mapwash/pages/totalOrder.dart';
+import 'package:my_flutter_mapwash/Oders/totalOrder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-// import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class sendwash extends StatefulWidget {
   const sendwash({super.key});
@@ -37,7 +36,6 @@ class _sendwashState extends State<sendwash> {
   String closestBranch = 'กำลังค้นหาสาขาที่ใกล้ที่สุด...';
   String codeBranch = '';
   bool isLoading = true; // สถานะการโหลด
-  // late Position currentPosition;
   String selectedAddress = ''; // ✅ ตัวแปรที่อยู่
   LatLng? selectedLatLng; // ✅ ตัวแปรพิกัด (nullable)
 
@@ -144,13 +142,34 @@ class _sendwashState extends State<sendwash> {
   }
 
   Future<void> _geoLocator() async {
-    final result = await location_helper.getCurrentLocationUser();
-    print(result);
-    if (result != null) {
-      setState(() {
-        selectedAddress = result['address'];
-        selectedLatLng = result['latlng'];
-      });
+    try {
+      final result = await location_helper.getCurrentLocationUser();
+      final prefs = await SharedPreferences.getInstance();
+      if (result != null) {
+        setState(() {
+          selectedAddress = result['address'];
+          selectedLatLng = result['latlng'];
+        });
+        double lat;
+        double lng;
+        if (result['latlng'] is String) {
+          String latlngString = result['latlng'];
+          String cleaned =
+              latlngString.replaceAll("LatLng(", "").replaceAll(")", "");
+          List<String> parts = cleaned.split(',');
+          lat = double.parse(parts[0]);
+          lng = double.parse(parts[1]);
+        } else {
+          lat = result['latlng'].latitude;
+          lng = result['latlng'].longitude;
+        }
+        await prefs.setDouble('lat', lat);
+        await prefs.setDouble('lng', lng);
+      } else {
+        print("⚠️ ไม่พบข้อมูลจาก location_helper");
+      }
+    } catch (e) {
+      print("❌ เกิดข้อผิดพลาดใน _geoLocator: $e");
     }
   }
 

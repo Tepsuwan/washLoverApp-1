@@ -3,9 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:my_flutter_mapwash/Home/promotion.dart';
+import 'package:my_flutter_mapwash/Oders/API/api_totalOrder.dart';
 import 'package:my_flutter_mapwash/Payment/walletQrcode.dart';
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TotalOrder extends StatefulWidget {
   @override
@@ -94,6 +96,30 @@ class _TotalOrderState extends State<TotalOrder> {
       "image": "assets/images/water01.png"
     },
   ];
+
+  Future<void> _send_update_location() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      double lat = prefs.getDouble('lat') ?? 0.0;
+      double lng = prefs.getDouble('lng') ?? 0.0;
+      print('lat:   ${lat}');
+      print('lng:   ${lng}');
+
+      bool success = await ApiPost.updateLocation(lat: lat, lng: lng);
+
+      if (success) {
+        print(lat);
+        print(lng);
+        // ถ้ามี state ที่ต้องอัปเดต เช่นสถานะบนหน้า UI
+        // ให้ใช้ setState(() {}) ได้เลย เช่น:
+        // setState(() { locationUpdated = true; });
+      } else {
+        print('❌ อัปเดตพิกัดล้มเหลว');
+      }
+    } catch (e) {
+      print('Error loading history: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -300,6 +326,7 @@ class _TotalOrderState extends State<TotalOrder> {
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    _send_update_location();
                     Navigator.push(
                       context,
                       MaterialPageRoute(

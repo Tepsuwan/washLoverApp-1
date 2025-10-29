@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
 import 'package:my_flutter_mapwash/Oders/location_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class address_user extends StatefulWidget {
   final Function(String address, LatLng location) onLocationPicked;
@@ -191,11 +192,14 @@ class _address_userState extends State<address_user> {
               ),
             ),
             onPressed: _selectedLocation != null
-                ? () {
+                ? () async {
                     widget.onLocationPicked(
                       _selectedAddress,
                       _selectedLocation!,
                     );
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setDouble('lat', _selectedLocation!.latitude);
+                    await prefs.setDouble('lng', _selectedLocation!.longitude);
                     Navigator.pop(context);
                   }
                 : null,
