@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:loading_indicator/loading_indicator.dart';
+import 'package:my_flutter_mapwash/Status/API/api_status.dart';
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_flutter_mapwash/Status/realtime_status.dart';
 
@@ -60,6 +60,7 @@ class BalanceScreen extends State<Status> {
   }
 
   Future<List<Map<String, dynamic>>> fetchOrders(String phone) async {
+     List<dynamic> data = await api_status.fetchstatus();
     final response = await http.get(Uri.parse(
         'https://android-dcbef-default-rtdb.firebaseio.com/order/$phone.json'));
     if (response.statusCode == 200) {
