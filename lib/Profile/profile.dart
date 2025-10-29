@@ -15,19 +15,20 @@ class profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<profile> {
-  Map<String, dynamic>? profileData;
   bool isLoading = true;
   String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-    loadProfile();
+    _loadProfile();
   }
 
-  Future<void> loadProfile() async {
+  Map<String, dynamic> profileData = {};
+
+  Future<void> _loadProfile() async {
     try {
-      final data = await fetchProfile();
+      Map<String, dynamic> data = await api_profile.fetchProfile();
       setState(() {
         profileData = data;
         isLoading = false;
@@ -64,7 +65,7 @@ class _ProfileState extends State<profile> {
   }
 
   Widget buildProfileContent(BuildContext context) {
-    final data = profileData!;
+    final data = profileData;
     return SingleChildScrollView(
       child: Column(
         children: [

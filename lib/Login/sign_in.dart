@@ -66,7 +66,7 @@ class _SignInState extends State<SignIn> {
           await prefs.setString('token', token);
           await prefs.setString('phone', phone);
           await prefs.setString('password', password);
-          print('prefs: $prefs');
+          print('prefs: $token');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('เข้าสู่ระบบสำเร็จ')),
           );
