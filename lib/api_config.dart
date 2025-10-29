@@ -7,7 +7,8 @@ class api_config {
   /// โหลด endpoint จาก cache หรือ server
   static Future<void> loadEndpoint() async {
     final prefs = await SharedPreferences.getInstance();
-    final cached = prefs.getString('endpoint');
+    String cached = prefs.getString('endpoint')?? '';
+   
     if (cached != null && cached.isNotEmpty) {
       endpoint = cached;
       print('✅ ใช้ endpoint จาก cache: $endpoint');
