@@ -110,11 +110,7 @@ class _TotalOrderState extends State<TotalOrder> {
       if (success) {
         print(lat);
         print(lng);
-        // ถ้ามี state ที่ต้องอัปเดต เช่นสถานะบนหน้า UI
-        // ให้ใช้ setState(() {}) ได้เลย เช่น:
-        // setState(() { locationUpdated = true; });
       } else {
-        print('❌ อัปเดตพิกัดล้มเหลว');
       }
     } catch (e) {
       print('Error loading history: $e');

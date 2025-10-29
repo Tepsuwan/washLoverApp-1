@@ -38,6 +38,8 @@ class _SignInState extends State<SignIn> {
   void _handleLogin() async {
     final phone = _phoneController.text.trim();
     final password = _passwordController.text.trim();
+    final prefs = await SharedPreferences.getInstance();
+    final endpoint = prefs.getString('endpoint');
     if (phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
@@ -48,7 +50,7 @@ class _SignInState extends State<SignIn> {
     setState(() => _isLoading = true);
 
     try {
-      final url = Uri.parse('https://members.washlover.com/api/auth/token');
+      final url = Uri.parse('${endpoint}/api/auth/token');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
