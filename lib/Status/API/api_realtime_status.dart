@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApistatusRealtime {
-  Future<Map<String, dynamic>?> getStatusRealtime(
+  Future<Map<String, dynamic>?> StReal(
       String deviceId, String id) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
@@ -36,7 +36,7 @@ class ApistatusRealtime {
 }
 
 class ApistatusDriver {
-  Future<Map<String, dynamic>?> getDestinationDriver(
+  Future<Map<String, dynamic>?> stDriver(
       String deviceId, String id) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';

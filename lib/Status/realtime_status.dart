@@ -30,7 +30,9 @@ class _realtime_statusState extends State<realtime_status> {
   String travelTime = 'สถานะ';
   Set<Polyline> _polylines = {};
   late GoogleMapController _mapController;
+
   Set<Marker> _markers = {};
+
   Map<String, dynamic>? _orderDetails;
 
   Timer? _timer;
@@ -189,7 +191,6 @@ class _realtime_statusState extends State<realtime_status> {
     }
   };
 
-  // สถานะปัจจุบัน
   String? currentStatus;
   String? statusDescription;
 
@@ -205,27 +206,111 @@ class _realtime_statusState extends State<realtime_status> {
     super.dispose();
   }
 
-// เริ่ม Timer
   void startRealtimeUpdates() {
     _timer = Timer.periodic(Duration(seconds: 5), (timer) async {
       await fetchRealtimeStatus();
     });
   }
 
-// สิ้นสุด Timer
   void stopRealtimeUpdates() {
     _timer?.cancel();
   }
 
-  // ฟังก์ชันดึงข้อมูลจาก API
+  double _lat = 0.0;
+  double _long = 0.0;
+  double _latdri = 0.0;
+  double _longdri = 0.0;
+
+  void _updateMarkersAndPolylines() {
+    if (_mapController == null) return;
+
+    double tolerance = 0.00001;
+    bool samePoint = ((_lat - _latdri).abs() < tolerance) &&
+        ((_long - _longdri).abs() < tolerance);
+
+    // เคลียร์ Marker และ Polyline เก่า
+    setState(() {
+      _markers.clear();
+      _polylines.clear();
+
+      if (samePoint) {
+        // แสดง Marker เดียว
+        _markers.add(
+          Marker(
+            markerId: MarkerId("current"),
+            position: LatLng(_lat, _long),
+            infoWindow: InfoWindow(title: "ตำแหน่งปัจจุบัน"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen),
+          ),
+        );
+      } else {
+        // แสดง Marker 2 จุด
+        _markers.addAll([
+          Marker(
+            markerId: MarkerId("user"),
+            position: LatLng(_lat, _long),
+            infoWindow: InfoWindow(title: "ผู้ใช้"),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          ),
+          Marker(
+            markerId: MarkerId("driver"),
+            position: LatLng(_latdri, _longdri),
+            infoWindow: InfoWindow(title: "คนขับ"),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          ),
+        ]);
+
+        // วาด Polyline
+        _polylines.add(
+          Polyline(
+            polylineId: PolylineId("route"),
+            color: Colors.blue,
+            width: 5,
+            points: [
+              LatLng(_lat, _long),
+              LatLng(_latdri, _longdri),
+            ],
+          ),
+        );
+      }
+    });
+
+    // โฟกัสกล้องตรงกลาง
+    double centerLat, centerLng;
+    if ((_lat == 0.0 && _long == 0.0) || (_latdri == 0.0 && _longdri == 0.0)) {
+      // ไม่มีพิกัด → ใช้ค่า default
+      centerLat = 16.235080;
+      centerLng = 103.260404;
+    } else if (samePoint) {
+      centerLat = _lat;
+      centerLng = _long;
+    } else {
+      centerLat = (_lat + _latdri) / 2;
+      centerLng = (_long + _longdri) / 2;
+    }
+
+    _mapController.animateCamera(
+      CameraUpdate.newLatLngZoom(LatLng(centerLat, centerLng), 16),
+    );
+  }
+
   Future<void> fetchRealtimeStatus() async {
-    final api = ApistatusRealtime();
-    final data = await api.getStatusRealtime(widget.deviceId, widget.id);
+    final apiCustomer = ApistatusRealtime();
+    final apiDriver = ApistatusDriver();
+    final data = await apiCustomer.StReal(widget.deviceId, widget.id);
+    final dtDri = await apiDriver.stDriver(widget.deviceId, widget.id);
 
     if (data != null) {
       setState(() {
-        // _latitude = data['latitude'];
-        // _longitude = data['longitude'];
+        _lat = data['latitude'];
+        _long = data['longitude'];
+
+        _latdri = dtDri!['latitude'];
+        _longdri = dtDri['longitude'];
+
         currentStatus = data['status'].toString();
         statusDescription = deliveryStatuses
             .firstWhere(
@@ -234,39 +319,8 @@ class _realtime_statusState extends State<realtime_status> {
             )['description']
             .toString();
       });
+      _updateMarkersAndPolylines();
     }
-  }
-
-  LatLng movingMarkerPosition = LatLng(16.235080, 103.260404);
-
-  void startMovingMarker() {
-    Timer.periodic(Duration(milliseconds: 100), (timer) {
-      // อัปเดตตำแหน่งทีละนิด
-      movingMarkerPosition = LatLng(
-        movingMarkerPosition.latitude + 0.00005,
-        movingMarkerPosition.longitude + 0.00005,
-      );
-
-      // อัปเดต Marker
-      setState(() {
-        _markers.removeWhere((m) => m.markerId.value == "moving");
-        _markers.add(
-          Marker(
-            markerId: MarkerId("moving"),
-            position: movingMarkerPosition,
-            infoWindow: InfoWindow(title: "กำลังเคลื่อนที่"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-                BitmapDescriptor.hueGreen),
-          ),
-        );
-      });
-
-      // หยุด Timer เมื่อถึงจุดสิ้นสุด
-      if (movingMarkerPosition.latitude >= 16.237000 &&
-          movingMarkerPosition.longitude >= 103.263000) {
-        timer.cancel();
-      }
-    });
   }
 
   @override
@@ -287,38 +341,9 @@ class _realtime_statusState extends State<realtime_status> {
               target: LatLng(16.235080, 103.260404),
               zoom: 16,
             ),
-            onMapCreated: (GoogleMapController controller) async {
+            onMapCreated: (controller) {
               _mapController = controller;
-              setState(() {
-                _markers.addAll([
-                  Marker(
-                    markerId: MarkerId("start"),
-                    position: LatLng(16.235080, 103.260404),
-                    infoWindow: InfoWindow(title: "จุดเริ่มต้น"),
-                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueBlue),
-                  ),
-                  Marker(
-                    markerId: MarkerId("end"),
-                    position: LatLng(16.237000, 103.263000),
-                    infoWindow: InfoWindow(title: "จุดสิ้นสุด"),
-                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueRed),
-                  ),
-                ]);
-                _polylines.add(
-                  Polyline(
-                    polylineId: PolylineId("route"),
-                    color: Colors.blue,
-                    width: 5,
-                    points: [
-                      LatLng(16.235080, 103.260404),
-                      LatLng(16.236000, 103.261000),
-                      LatLng(16.237000, 103.263000),
-                    ],
-                  ),
-                );
-              });
+              _updateMarkersAndPolylines();
             },
             markers: _markers,
             polylines: _polylines,
