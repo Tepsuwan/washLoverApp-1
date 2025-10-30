@@ -87,8 +87,8 @@ class _HistoryState extends State<History> {
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'ประวัติรายการ',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
@@ -97,14 +97,30 @@ class _HistoryState extends State<History> {
                         ),
                       ),
                       Text(
-                        'ต.ค. 2568',
-                        style: TextStyle(
+                        getCurrentDateThai(), // แสดงวันที่ปัจจุบันแบบเต็ม
+                        style: const TextStyle(
                           color: Color(0xFF8A8A8A),
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],
+                  ),
+                ),
+
+                // ====== ส่วนแสดงอัปเดตล่าสุด ======
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 24, right: 24, bottom: 5),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'อัปเดตล่าสุดเมื่อ ${getCurrentDateThai()}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
 
@@ -119,21 +135,6 @@ class _HistoryState extends State<History> {
                         ),
                       ),
                     ],
-                  ),
-                ),
-
-                const Padding(
-                  padding:
-                      EdgeInsets.only(left: 24, right: 24, top: 6, bottom: 10),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'อัปเดตล่าสุดเมื่อ 21 ต.ค. 2568 เวลา 18:45',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
                   ),
                 ),
 
@@ -686,6 +687,29 @@ class _HistoryState extends State<History> {
       default:
         return Colors.grey; // เผื่อค่าที่ไม่ตรง
     }
+  }
+
+  // สร้างตัวแปรแสดงเดือนปัจจุบันแบบไทย
+  String getCurrentDateThai() {
+    final monthsThai = [
+      'ม.ค.',
+      'ก.พ.',
+      'มี.ค.',
+      'เม.ย.',
+      'พ.ค.',
+      'มิ.ย.',
+      'ก.ค.',
+      'ส.ค.',
+      'ก.ย.',
+      'ต.ค.',
+      'พ.ย.',
+      'ธ.ค.'
+    ];
+    final now = DateTime.now();
+    final day = now.day;
+    final month = monthsThai[now.month - 1];
+    final year = now.year + 543; // แปลงเป็น พ.ศ.
+    return '$day $month $year';
   }
 
   String _getStatusText(String status) {
