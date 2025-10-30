@@ -11,9 +11,14 @@ import 'dart:ui' as ui;
 import 'package:timeline_tile/timeline_tile.dart';
 
 class realtime_status extends StatefulWidget {
-  final String = 'WL504052635n0V6i';
+  final String id;
+  final String deviceId;
 
-  // const realtime_status({required this.orderId});
+  const realtime_status({
+    super.key,
+    required this.id,
+    required this.deviceId,
+  });
 
   @override
   _realtime_statusState createState() => _realtime_statusState();

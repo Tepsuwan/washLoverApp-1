@@ -19,19 +19,7 @@ class _StatusState extends State<Status> {
   @override
   void initState() {
     super.initState();
-    _loadPhoneAndStatus();
-  }
-
-  Future<void> _loadPhoneAndStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedPhone = prefs.getString('phone');
-
-    if (storedPhone != null && storedPhone.isNotEmpty) {
-      setState(() => phone = storedPhone);
-      _loadStatus();
-    } else {
-      print('Phone not found in SharedPreferences');
-    }
+    _loadStatus();
   }
 
   Future<void> _loadStatus() async {
@@ -85,32 +73,71 @@ class _StatusState extends State<Status> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: phone == null
-            ? const Center(child: CircularProgressIndicator())
-            : _statusData.isEmpty
-                ? const Center(child: Text('ไม่มีข้อมูล'))
-                : ListView.builder(
-                    itemCount: _statusData.length,
-                    itemBuilder: (context, index) {
-                      final order = _statusData[index];
-                      final price =
-                          double.tryParse(order['price']?.toString() ?? '0') ??
-                              0.0;
-                      return _buildTransactionItem(
-                        context,
-                        icon: Icons.online_prediction_sharp,
-                        color: Colors.green,
-                        title: order['id'].toString(),
-                        orderId: order['id'].toString(),
-                        subtitle: formatDate(order['set_at'] ?? ''),
-                        amount:
-                            '฿${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
-                        time: formatTime(order['set_at'] ?? ''),
-                      );
-                    },
-                  ),
+        child: _statusData.isEmpty
+            ? _buildEmptyStatus()
+            : ListView.builder(
+                itemCount: _statusData.length,
+                itemBuilder: (context, index) {
+                  final order = _statusData[index];
+
+                  // กรอง status 4 ถ้าไม่ต้องการแสดง
+                  if (order['status'] == 4) return const SizedBox.shrink();
+
+                  final price =
+                      double.tryParse(order['price']?.toString() ?? '0') ?? 0.0;
+
+                  // แปลง status เป็นข้อความและสี
+                  final statusInfo = getStatusInfo(order['status'] ?? 0);
+                  return _buildTransactionItem(
+                    context,
+                    icon: Icons.online_prediction_sharp,
+                    color: statusInfo['color'],
+                    title: statusInfo['text'],
+                    subtitle: formatDate(order['set_at'] ?? ''),
+                    amount: '฿${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
+                    time: formatTime(order['set_at'] ?? ''),
+                    id: order['id'].toString(),
+                    device_id: order['device_id'].toString(),
+                  );
+                },
+              ),
       ),
     );
+  }
+
+  Widget _buildEmptyStatus() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            'assets/images/collectionduck/Artboard1copy4.png',
+            width: 120,
+            height: 90,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'ไม่มีประวัติการใช้งาน',
+            style: TextStyle(color: Colors.grey[600], fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Map<String, dynamic> getStatusInfo(int status) {
+    switch (status) {
+      case 1:
+        return {'text': 'กำลังหาคนขับ...', 'color': Colors.green};
+      case 2:
+        return {'text': 'คนขับรับงาน', 'color': Colors.blue};
+      case 3:
+        return {'text': 'กำลังซัก', 'color': Colors.orange};
+      case 4:
+        return {'text': 'งานเสร็จ', 'color': Colors.grey};
+      default:
+        return {'text': 'ไม่ทราบสถานะ', 'color': Colors.black};
+    }
   }
 
   Widget _buildTransactionItem(
@@ -121,14 +148,18 @@ class _StatusState extends State<Status> {
     required String subtitle,
     required String amount,
     required String time,
-    required String orderId,
+    required String id,
+    required String device_id,
   }) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => realtime_status(),
+            builder: (context) => realtime_status(
+              id: id,
+              deviceId: device_id,
+            ),
           ),
         );
       },
