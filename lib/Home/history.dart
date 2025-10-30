@@ -80,24 +80,26 @@ class _HistoryState extends State<History> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildBalanceCard(),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+
+                // ====== หัวข้อส่วนบน ======
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    children: const [
                       Text(
                         'ประวัติรายการ',
                         style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.black87,
-                          letterSpacing: 0.2,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 22,
+                          color: Color(0xFF1B1B1B),
                         ),
                       ),
                       Text(
                         'ต.ค. 2568',
                         style: TextStyle(
-                          color: Colors.grey,
+                          color: Color(0xFF8A8A8A),
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                         ),
@@ -105,8 +107,24 @@ class _HistoryState extends State<History> {
                     ],
                   ),
                 ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 1.2,
+                          color: Colors.grey.withOpacity(0.15),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 const Padding(
-                  padding: EdgeInsets.only(left: 50, right: 50, bottom: 5),
+                  padding:
+                      EdgeInsets.only(left: 24, right: 24, top: 6, bottom: 10),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -119,120 +137,168 @@ class _HistoryState extends State<History> {
                   ),
                 ),
 
-                ////////////////////////////////////////// รายการ //////////////////////////////////////////
+                // ====== เนื้อหา ======
                 Expanded(
                   child: _historyData.isEmpty
                       ? _buildEmptyHistory()
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 6),
                           itemCount: _historyData.length,
                           itemBuilder: (context, index) {
                             var item = _historyData[index];
                             String date = item['set_at'] ?? '-';
                             String time = item['started_at'] ?? '-';
                             String status = (item['status'] ?? '').toString();
+                            String price = item['duration_str'] ?? '0.0';
 
-                            // String phone = item['phone'] ?? '-';
-                            String price = item['duration_str'] ?? 0.0;
                             return Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 14),
+                              margin: const EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.92),
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFDFEFF),
+                                    Color(0xFFF7F9FF),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.03),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 3),
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ],
-                                border: Border.all(
-                                  color: Colors.grey.withOpacity(0.08),
-                                ),
                               ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    height: 46,
-                                    width: 46,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFFDDEBFF),
-                                          Color(0xFFF4F8FF)
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                    ),
-                                    child: const Icon(
-                                      Icons.local_laundry_service_rounded,
-                                      color: Color(0xFF1E62F9),
-                                      size: 24,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 14),
-
-                                  ////////////////////////////////////////// รายการ //////////////////////////////////////////
-                                  Expanded(
-                                    child: Column(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(20),
+                                  onTap: () {},
+                                  splashColor:
+                                      const Color(0xFF1E62F9).withOpacity(0.08),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 16),
+                                    child: Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          formatThaiDate(date, time),
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color:
-                                                Color.fromARGB(255, 80, 80, 80),
+                                        // ===== ไอคอน =====
+                                        Container(
+                                          height: 50,
+                                          width: 50,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFF4E9FFF),
+                                                Color(0xFF1E62F9)
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.blueAccent
+                                                    .withOpacity(0.25),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Icon(
+                                            Icons.local_laundry_service_rounded,
+                                            color: Colors.white,
+                                            size: 26,
                                           ),
                                         ),
-                                        const SizedBox(height: 3),
-                                        // Text(
-                                        //   phone,
-                                        //   style: const TextStyle(
-                                        //     fontSize: 14.5,
-                                        //     fontWeight: FontWeight.w500,
-                                        //     color: Colors.black87,
-                                        //   ),
-                                        // ),
-                                        const SizedBox(height: 8),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 3),
-                                          decoration: BoxDecoration(
-                                            color: _getStatusColor(status)
-                                                .withOpacity(0.08),
-                                            borderRadius:
-                                                BorderRadius.circular(6),
+
+                                        const SizedBox(width: 16),
+
+                                        // ===== ข้อมูล =====
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                formatThaiDate(date, time),
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              // Text(
+                                              //   _getStatusText(status),
+                                              //   style: const TextStyle(
+                                              //     fontSize: 16,
+                                              //     fontWeight: FontWeight.w600,
+                                              //     color: Colors.black87,
+                                              //   ),
+                                              // ),
+                                              // const SizedBox(height: 6),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 5),
+                                                decoration: BoxDecoration(
+                                                  color: _getStatusColor(status)
+                                                      .withOpacity(
+                                                          0.25), // เข้มขึ้นจาก 0.1 → 0.25
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color: _getStatusColor(
+                                                            status)
+                                                        .withOpacity(
+                                                            0.5), // เสริมขอบเข้มเล็กน้อย
+                                                    width: 1,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: _getStatusColor(
+                                                              status)
+                                                          .withOpacity(
+                                                              0.15), // เพิ่มเงาเบา ๆ
+                                                      blurRadius: 4,
+                                                      offset:
+                                                          const Offset(0, 2),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Text(
+                                                  _getStatusText(status),
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors
+                                                        .white, // เปลี่ยนเป็นขาวให้ตัดกับพื้นสี
+                                                    letterSpacing: 0.3,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          child: Text(
-                                            _getStatusText(status),
-                                            style: TextStyle(
-                                              color: _getStatusColor(status),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                        ),
+
+                                        // ===== ราคา =====
+                                        Text(
+                                          '฿$price',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 20,
+                                            color: Color(0xFF1E62F9),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-
-                                  ////////////////////////////////////////// ราคา //////////////////////////////////////////
-                                  Text(
-                                    '฿${price}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             );
                           },
@@ -431,24 +497,19 @@ class _HistoryState extends State<History> {
     ];
 
     try {
-      // ✅ กรณี date เป็นรูปแบบ ISO เช่น 2025-10-24T18:45:00Z
       String dateTimeString;
       if (date.contains('T')) {
         dateTimeString = date;
       } else {
         dateTimeString = time.isNotEmpty ? '$date $time' : date;
       }
-
       DateTime dt = DateTime.parse(dateTimeString).toLocal();
-
       final buddhistYear = dt.year + 543;
       final thaiMonth = monthsThai[dt.month - 1];
       final formattedTime =
           '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-
       return '${dt.day} $thaiMonth $buddhistYear $formattedTime น.';
     } catch (e) {
-      // ถ้า parse ไม่ได้ให้ส่งคืนแบบเดิม
       return '$date ${time ?? ''}'.trim();
     }
   }
@@ -621,27 +682,31 @@ class _HistoryState extends State<History> {
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case '4':
-        return Colors.green;
-      case '3':
-        return Colors.orange;
-      case '2':
-        return Colors.red;
+      case '4': // เสร็จสิ้น
+        return const Color(0xFF2ECC71); // เขียวสด
+      case '3': // ไม่สำเร็จ
+        return const Color(0xFFE74C3C); // แดงเข้ม
+      case '2': // คนขับรับงานแล้ว
+        return const Color(0xFF3498DB); // ฟ้าน้ำทะเล
+      case '1': // รอคนขับ
+        return const Color(0xFFF1C40F); // เหลืองทอง
       default:
-        return Colors.grey;
+        return Colors.grey; // เผื่อค่าที่ไม่ตรง
     }
   }
 
   String _getStatusText(String status) {
     switch (status.toLowerCase()) {
       case '4':
-        return 'สำเร็จ';
+        return 'เสร็จสิ้น';
       case '3':
-        return 'กำลังดำเนินการ';
-      case '2':
         return 'ไม่สำเร็จ';
+      case '2':
+        return 'คนขับรับงานแล้ว';
+      case '1':
+        return 'รอคนขับ';
       default:
-        return status;
+        return 'ไม่ทราบสถานะ';
     }
   }
 }
