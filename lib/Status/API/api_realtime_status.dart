@@ -2,16 +2,18 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class api_status {
-  // ดึงประวัติจาก API
-  static Future<List<dynamic>> fetchstatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('token') ?? '';
-    String endpoint = prefs.getString('endpoint') ?? '';
+class ApistatusRealtime {
+  Future<Map<String, dynamic>?> getStatusRealtime(
+      String deviceId, String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final endpoint = prefs.getString('endpoint');
+
+    final url = Uri.parse('$endpoint/api/get_destination?device_id=$deviceId');
 
     try {
       final response = await http.get(
-        Uri.parse("${endpoint}/api/member/history"),
+        url,
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -19,43 +21,28 @@ class api_status {
       );
 
       if (response.statusCode == 200) {
-        print("Response: ${response.body}");
         final data = json.decode(response.body);
-
-        List<dynamic> listData = [];
-
-        if (data is List) {
-          listData = data;
-        } else if (data is Map && data['data'] != null) {
-          listData = data['data'];
-        }
-
-        // กรองเอา status ที่ไม่เท่ากับ 4
-        final filteredData = listData.where((item) {
-          return item['status'] != 4;
-        }).toList();
-
-        return filteredData;
+        return data;
       } else {
-        print("Error: ${response.statusCode}");
-        return [];
+        print(
+            '⚠️ [$id] Error: ${response.statusCode} (${response.reasonPhrase})');
+        return null;
       }
     } catch (e) {
-      print("Exception: $e");
-      return [];
+      print('❌ [$id] Error fetching destination status: $e');
+      return null;
     }
   }
 }
 
-class ApistatusOrder {
-  /// ดึงสถานะปลายทางของอุปกรณ์ (device)
-  Future<Map<String, dynamic>?> fetchDestinationStatus(
+class ApistatusDriver {
+  Future<Map<String, dynamic>?> getDestinationDriver(
       String deviceId, String id) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final endpoint = prefs.getString('endpoint');
 
-    final url = Uri.parse('$endpoint/api/get_destination?device_id=$deviceId');
+    final url = Uri.parse('$endpoint/api/get_last_location?device_id=$deviceId');
 
     try {
       final response = await http.get(

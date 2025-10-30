@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
+import 'package:my_flutter_mapwash/Status/API/api_realtime_status.dart';
 import 'dart:math'; // เพิ่มการนำเข้าคลาส dart:math
 import 'dart:ui' as ui;
 import 'package:timeline_tile/timeline_tile.dart';
@@ -32,17 +33,25 @@ class _realtime_statusState extends State<realtime_status> {
   Set<Marker> _markers = {};
   Map<String, dynamic>? _orderDetails;
 
+  Timer? _timer;
+
+  Map<String, Future<Map<String, dynamic>?>> _futureCache = {};
+
   final List<Map<String, dynamic>> deliveryStatuses = [
     {
-      'status': ['pending', 'accepted'],
+      'status': [
+        'pending',
+        'accepted',
+        '1',
+      ],
       'description': 'ค้นหาไรเดอร์ / ไรเดอร์รับออเดอร์'
     },
     {
-      'status': ['receive', 'delivering'],
+      'status': ['receive', 'delivering', '2'],
       'description': 'ไรเดอร์รับของจากลูกค้า'
     },
     {
-      'status': ['washing', 'completed', 'success'],
+      'status': ['washing', 'completed', 'success', '3'],
       'description': 'กำลังซัก'
     },
     {
@@ -56,7 +65,7 @@ class _realtime_statusState extends State<realtime_status> {
       'description': 'ไรเดอร์กำลังนำส่งคืนลูกค้า'
     },
     {
-      'status': ['return_success'],
+      'status': ['return_success', '4'],
       'description': 'ส่งคืนลูกค้าเรียบร้อย'
     },
   ];
@@ -75,15 +84,6 @@ class _realtime_statusState extends State<realtime_status> {
     'send_return',
     'return_success',
   ];
-
-  // สถานะปัจจุบัน
-  String? currentStatus;
-  String? statusDescription;
-  @override
-  void initState() {
-    super.initState();
-    loadMapData23();
-  }
 
   Map<String, dynamic> orderDetails = {
     "branch": {
@@ -188,19 +188,85 @@ class _realtime_statusState extends State<realtime_status> {
       "subdistrict": "ตำบลราชาเทวะ"
     }
   };
-  Future<void> loadMapData23() async {
-    try {
+
+  // สถานะปัจจุบัน
+  String? currentStatus;
+  String? statusDescription;
+
+  @override
+  void initState() {
+    super.initState();
+    startRealtimeUpdates();
+  }
+
+  @override
+  void dispose() {
+    stopRealtimeUpdates();
+    super.dispose();
+  }
+
+// เริ่ม Timer
+  void startRealtimeUpdates() {
+    _timer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      await fetchRealtimeStatus();
+    });
+  }
+
+// สิ้นสุด Timer
+  void stopRealtimeUpdates() {
+    _timer?.cancel();
+  }
+
+  // ฟังก์ชันดึงข้อมูลจาก API
+  Future<void> fetchRealtimeStatus() async {
+    final api = ApistatusRealtime();
+    final data = await api.getStatusRealtime(widget.deviceId, widget.id);
+
+    if (data != null) {
       setState(() {
-        _orderDetails = orderDetails;
-        currentStatus = orderDetails['status'];
+        // _latitude = data['latitude'];
+        // _longitude = data['longitude'];
+        currentStatus = data['status'].toString();
         statusDescription = deliveryStatuses
-            .firstWhere((status) => status['status'].contains(currentStatus),
-                orElse: () => {'description': 'สถานะไม่พบ'})['description']
+            .firstWhere(
+              (status) => status['status'].contains(currentStatus),
+              orElse: () => {'description': 'สถานะไม่พบ'},
+            )['description']
             .toString();
       });
-    } catch (e) {
-      print('เกิดข้อผิดพลาดในการโหลดข้อมูล: $e');
     }
+  }
+
+  LatLng movingMarkerPosition = LatLng(16.235080, 103.260404);
+
+  void startMovingMarker() {
+    Timer.periodic(Duration(milliseconds: 100), (timer) {
+      // อัปเดตตำแหน่งทีละนิด
+      movingMarkerPosition = LatLng(
+        movingMarkerPosition.latitude + 0.00005,
+        movingMarkerPosition.longitude + 0.00005,
+      );
+
+      // อัปเดต Marker
+      setState(() {
+        _markers.removeWhere((m) => m.markerId.value == "moving");
+        _markers.add(
+          Marker(
+            markerId: MarkerId("moving"),
+            position: movingMarkerPosition,
+            infoWindow: InfoWindow(title: "กำลังเคลื่อนที่"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen),
+          ),
+        );
+      });
+
+      // หยุด Timer เมื่อถึงจุดสิ้นสุด
+      if (movingMarkerPosition.latitude >= 16.237000 &&
+          movingMarkerPosition.longitude >= 103.263000) {
+        timer.cancel();
+      }
+    });
   }
 
   @override
