@@ -143,7 +143,7 @@ class _HistoryState extends State<History> {
                       ? _buildEmptyHistory()
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 6),
+                              horizontal: 20, vertical: 12),
                           itemCount: _historyData.length,
                           itemBuilder: (context, index) {
                             var item = _historyData[index];
@@ -152,14 +152,16 @@ class _HistoryState extends State<History> {
                             String status = (item['status'] ?? '').toString();
                             String price = item['duration_str'] ?? '0.0';
 
+                            Color statusColor = _getStatusColor(status);
+
                             return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
+                              margin: const EdgeInsets.only(bottom: 18),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(22),
                                 gradient: const LinearGradient(
                                   colors: [
-                                    Color(0xFFFDFEFF),
-                                    Color(0xFFF7F9FF),
+                                    Color(0xFFF8FAFF),
+                                    Color(0xFFEFF2FF)
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
@@ -167,56 +169,59 @@ class _HistoryState extends State<History> {
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
+                                    offset: const Offset(4, 4),
+                                    blurRadius: 15,
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.8),
+                                    offset: const Offset(-4, -4),
+                                    blurRadius: 15,
                                   ),
                                 ],
                               ),
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(22),
                                   onTap: () {},
-                                  splashColor:
-                                      const Color(0xFF1E62F9).withOpacity(0.08),
+                                  splashColor: statusColor.withOpacity(0.15),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 16),
+                                    padding: const EdgeInsets.all(18),
                                     child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
                                         // ===== ไอคอน =====
                                         Container(
-                                          height: 50,
-                                          width: 50,
+                                          height: 52,
+                                          width: 52,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
-                                            gradient: const LinearGradient(
+                                            gradient: LinearGradient(
                                               colors: [
-                                                Color(0xFF4E9FFF),
-                                                Color(0xFF1E62F9)
+                                                statusColor.withOpacity(0.8),
+                                                statusColor,
                                               ],
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
                                             ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.blueAccent
-                                                    .withOpacity(0.25),
+                                                color: statusColor
+                                                    .withOpacity(0.35),
                                                 blurRadius: 8,
-                                                offset: const Offset(0, 3),
+                                                offset: const Offset(0, 4),
                                               ),
                                             ],
                                           ),
                                           child: const Icon(
                                             Icons.local_laundry_service_rounded,
                                             color: Colors.white,
-                                            size: 26,
+                                            size: 28,
                                           ),
                                         ),
 
-                                        const SizedBox(width: 16),
+                                        const SizedBox(width: 18),
 
                                         // ===== ข้อมูล =====
                                         Expanded(
@@ -229,45 +234,34 @@ class _HistoryState extends State<History> {
                                                 style: const TextStyle(
                                                   fontSize: 13,
                                                   color: Colors.grey,
+                                                  fontWeight: FontWeight.w400,
                                                 ),
                                               ),
-                                              const SizedBox(height: 5),
-                                              // Text(
-                                              //   _getStatusText(status),
-                                              //   style: const TextStyle(
-                                              //     fontSize: 16,
-                                              //     fontWeight: FontWeight.w600,
-                                              //     color: Colors.black87,
-                                              //   ),
-                                              // ),
-                                              // const SizedBox(height: 6),
+                                              const SizedBox(height: 8),
                                               Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 5),
+                                                        horizontal: 14,
+                                                        vertical: 6),
                                                 decoration: BoxDecoration(
-                                                  color: _getStatusColor(status)
-                                                      .withOpacity(
-                                                          0.25), // เข้มขึ้นจาก 0.1 → 0.25
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  border: Border.all(
-                                                    color: _getStatusColor(
-                                                            status)
-                                                        .withOpacity(
-                                                            0.5), // เสริมขอบเข้มเล็กน้อย
-                                                    width: 1,
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      statusColor
+                                                          .withOpacity(0.85),
+                                                      statusColor,
+                                                    ],
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
                                                   ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: _getStatusColor(
-                                                              status)
-                                                          .withOpacity(
-                                                              0.15), // เพิ่มเงาเบา ๆ
-                                                      blurRadius: 4,
+                                                      color: statusColor
+                                                          .withOpacity(0.3),
+                                                      blurRadius: 6,
                                                       offset:
-                                                          const Offset(0, 2),
+                                                          const Offset(0, 3),
                                                     ),
                                                   ],
                                                 ),
@@ -275,10 +269,9 @@ class _HistoryState extends State<History> {
                                                   _getStatusText(status),
                                                   style: const TextStyle(
                                                     fontSize: 13,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Colors
-                                                        .white, // เปลี่ยนเป็นขาวให้ตัดกับพื้นสี
-                                                    letterSpacing: 0.3,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                    letterSpacing: 0.4,
                                                   ),
                                                 ),
                                               ),
@@ -289,10 +282,10 @@ class _HistoryState extends State<History> {
                                         // ===== ราคา =====
                                         Text(
                                           '฿$price',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 20,
-                                            color: Color(0xFF1E62F9),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 22,
+                                            color: statusColor,
                                           ),
                                         ),
                                       ],
@@ -610,7 +603,7 @@ class _HistoryState extends State<History> {
               color: Colors.blue[50],
             ),
             child: const Icon(Icons.access_time,
-                color: Colors.blueAccent, size: 24),
+                color: Color.fromARGB(255, 115, 121, 132), size: 24),
           ),
           const SizedBox(width: 14),
           Expanded(
