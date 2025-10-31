@@ -7,7 +7,6 @@ class api_profile {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final endpoint = prefs.getString('endpoint');
-
     try {
       final response = await http.get(
         Uri.parse("$endpoint/api/member/profile"),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:my_flutter_mapwash/DirectionMap/direction_map.dart';
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
@@ -202,6 +203,7 @@ class _realtime_statusState extends State<realtime_status> {
 
   @override
   void dispose() {
+    _timer?.cancel();
     stopRealtimeUpdates();
     super.dispose();
   }
@@ -227,61 +229,27 @@ class _realtime_statusState extends State<realtime_status> {
     double tolerance = 0.00001;
     bool samePoint = ((_lat - _latdri).abs() < tolerance) &&
         ((_long - _longdri).abs() < tolerance);
-
-    // เคลียร์ Marker และ Polyline เก่า
     setState(() {
       _markers.clear();
       _polylines.clear();
-
-      if (samePoint) {
-        // แสดง Marker เดียว
-        _markers.add(
-          Marker(
-            markerId: MarkerId("current"),
-            position: LatLng(_lat, _long),
-            infoWindow: InfoWindow(title: "ตำแหน่งปัจจุบัน"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-                BitmapDescriptor.hueGreen),
-          ),
-        );
-      } else {
-        // แสดง Marker 2 จุด
-        _markers.addAll([
-          Marker(
-            markerId: MarkerId("user"),
-            position: LatLng(_lat, _long),
-            infoWindow: InfoWindow(title: "ผู้ใช้"),
-            icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          ),
-          Marker(
-            markerId: MarkerId("driver"),
-            position: LatLng(_latdri, _longdri),
-            infoWindow: InfoWindow(title: "คนขับ"),
-            icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          ),
-        ]);
-
-        // วาด Polyline
-        _polylines.add(
-          Polyline(
-            polylineId: PolylineId("route"),
-            color: Colors.blue,
-            width: 5,
-            points: [
-              LatLng(_lat, _long),
-              LatLng(_latdri, _longdri),
-            ],
-          ),
-        );
-      }
+      _markers.addAll([
+        Marker(
+          markerId: MarkerId("user"),
+          position: LatLng(_lat, _long),
+          infoWindow: InfoWindow(title: "ผู้ใช้"),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        ),
+        Marker(
+          markerId: MarkerId("driver"),
+          position: LatLng(_latdri, _longdri),
+          infoWindow: InfoWindow(title: "คนขับ"),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        ),
+      ]);
+      _drawRoute();
     });
-
-    // โฟกัสกล้องตรงกลาง
     double centerLat, centerLng;
     if ((_lat == 0.0 && _long == 0.0) || (_latdri == 0.0 && _longdri == 0.0)) {
-      // ไม่มีพิกัด → ใช้ค่า default
       centerLat = 16.235080;
       centerLng = 103.260404;
     } else if (samePoint) {
@@ -295,6 +263,43 @@ class _realtime_statusState extends State<realtime_status> {
     _mapController.animateCamera(
       CameraUpdate.newLatLngZoom(LatLng(centerLat, centerLng), 16),
     );
+  }
+
+  // ฟังก์ชันหลักสำหรับดึงเส้นทางจาก API
+  Future<void> _drawRoute() async {
+    final directionsService =
+        DirectionsService(googleApiKey: 'AIzaSyDEds_3tBG5jdPMRLZyBl1EJFo196mjNgs'); // ใส่ API Key ของคุณ
+    List<LatLng> routePoints = await directionsService.getRouteCoordinates(
+      startLat: _latdri,
+      startLng: _longdri,
+      endLat: _lat,
+      endLng: _long,
+    );
+
+    if (routePoints.isNotEmpty) {
+      _animatePolyline(routePoints); // เรียก animation ทีละจุด
+    }
+  }
+
+  // ฟังก์ชัน animate Polyline ทีละจุด
+  Future<void> _animatePolyline(List<LatLng> routePoints) async {
+    List<LatLng> animatedPoints = [];
+    for (var point in routePoints) {
+      await Future.delayed(Duration(milliseconds: 5)); // delay 100ms ต่อจุด
+      animatedPoints.add(point);
+
+      setState(() {
+        _polylines.clear();
+        _polylines.add(
+          Polyline(
+            polylineId: PolylineId("route"),
+            color: Colors.blue,
+            width: 5,
+            points: animatedPoints,
+          ),
+        );
+      });
+    }
   }
 
   Future<void> fetchRealtimeStatus() async {
