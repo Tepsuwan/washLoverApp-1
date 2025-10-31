@@ -107,26 +107,26 @@ class _ProfileState extends State<profile> {
           ),
 
           // เมนูต่างๆ
-          buildMenuItem(
-            icon: Icons.person,
-            text: "ข้อมูลส่วนตัว",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditProfilePage(
-                    nickname: data['nickname'] ?? '',
-                    phone: data['phone'] ?? '',
-                  ),
-                ),
-              );
-            },
-          ),
-          buildMenuItem(
-            icon: Icons.link,
-            text: "เชื่อมต่อบัญชี LINE",
-            onTap: () {},
-          ),
+          // buildMenuItem(
+          //   icon: Icons.person,
+          //   text: "ข้อมูลส่วนตัว",
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => EditProfilePage(
+          //           nickname: data['nickname'] ?? '',
+          //           phone: data['phone'] ?? '',
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // ),
+          // buildMenuItem(
+          //   icon: Icons.link,
+          //   text: "เชื่อมต่อบัญชี LINE",
+          //   onTap: () {},
+          // ),
           buildMenuItem(
             icon: Icons.account_balance_wallet,
             text: "วอลเล็ท (${data['balance'] ?? 0} บาท)",
@@ -148,11 +148,11 @@ class _ProfileState extends State<profile> {
             text: "ใช้งานล่าสุด: ${data['last_active'] ?? '-'}",
             onTap: () {},
           ),
-          buildMenuItem(
-            icon: Icons.perm_identity,
-            text: "รหัสอุปกรณ์: ${data['device_id'] ?? '-'}",
-            onTap: () {},
-          ),
+          // buildMenuItem(
+          //   icon: Icons.perm_identity,
+          //   text: "รหัสอุปกรณ์: ${data['device_id'] ?? '-'}",
+          //   onTap: () {},
+          // ),
           buildMenuLogout(
             icon: Icons.logout_rounded,
             text: "ออกจากระบบ",
