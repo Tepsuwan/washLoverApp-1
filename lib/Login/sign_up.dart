@@ -150,13 +150,13 @@ class _SignUpState extends State<SignUp> {
 
       final response = await http.post(
         Uri.parse("$endpoint/api/register"),
-        // headers: {'Content-Type': 'application/json'},
-        // body: jsonEncode({
-        //   "phone": phone,
-        //   "nickname": name,
-        //   "password": password,
-        //   // "affiliate": affiliate,
-        // }),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "phone": phone,
+          "nickname": name,
+          "password": password,
+          // "affiliate": affiliate,
+        }),
       );
 
       print(response.statusCode);
