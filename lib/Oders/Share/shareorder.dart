@@ -1,0 +1,28 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class SharePrefs {
+  static const String keyItems = 'selected_items';
+
+  /// 🔹 บันทึก List<Map<String, dynamic>> ลง SharedPreferences
+  static Future<void> saveItems(List<Map<String, dynamic>> items) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = jsonEncode(items);
+    await prefs.setString(keyItems, jsonString);
+  }
+
+  /// 🔹 ดึงข้อมูลกลับมา
+  static Future<List<Map<String, dynamic>>> getItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(keyItems);
+    if (jsonString == null) return []; // ถ้าไม่มีข้อมูล ให้ส่งกลับเป็น list ว่าง
+    final List decoded = jsonDecode(jsonString);
+    return List<Map<String, dynamic>>.from(decoded);
+  }
+
+  /// 🔹 ล้างข้อมูลทั้งหมด
+  static Future<void> clearItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(keyItems);
+  }
+}
