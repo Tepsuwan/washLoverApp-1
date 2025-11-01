@@ -120,25 +120,18 @@ class _SignUpState extends State<SignUp> {
     final password = _passwordController.text.trim();
     final confirm = _confirmPasswordController.text.trim();
     final affiliate = _affiliateController.text.trim();
-
-    // ✅ ตรวจสอบข้อมูลให้ครบ
     if (phone.isEmpty || name.isEmpty || password.isEmpty || confirm.isEmpty) {
       _showDialog("ผิดพลาด", "กรุณาระบุข้อมูลให้ครบถ้วน");
       return;
     }
-
-    // ✅ ตรวจสอบความยาวรหัสผ่าน
     if (password.length != 6) {
       _showDialog("ผิดพลาด", "PIN ต้องมีความยาว 6 ตัว");
       return;
     }
-
-    // ✅ ตรวจสอบว่ารหัสผ่านตรงกัน
     if (password != confirm) {
       _showDialog("ผิดพลาด", "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน");
       return;
     }
-
     try {
       final prefs = await SharedPreferences.getInstance();
       final endpoint = prefs.getString('endpoint') ?? "";
@@ -147,35 +140,43 @@ class _SignUpState extends State<SignUp> {
         _showDialog("ผิดพลาด", "ไม่พบ Endpoint ในระบบ");
         return;
       }
-
-      final response = await http.post(
-        Uri.parse("https://members.washlover.com/api/register"),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "phone": phone,
-          "nickname": name,
-          "password": password,
-          // "affiliate": affiliate,
-        }),
+      var headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+      };
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${endpoint}/api/register'),
       );
-
-      print(response.statusCode);
-
-      final data = jsonDecode(response.body);
-      if (data['status'] == 'error') {
-        _showDialog("ผิดพลาด", data['msg'] ?? "เกิดข้อผิดพลาดบางประการ");
+      request.fields.addAll({
+        'phone': phone,
+        'nickname': name,
+        'password': password,
+        // 'affiliate': affiliate, // ถ้ามีระบบ affiliate
+      });
+      request.headers.addAll(headers);
+      http.StreamedResponse response = await request.send();
+      print("Status code: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        print("Response body: $responseBody");
+        final data = jsonDecode(responseBody);
+        if (data['status'] == 'error') {
+          _showDialog("ผิดพลาด", data['msg'] ?? "เกิดข้อผิดพลาดบางประการ");
+        } else {
+          await prefs.setString('phone', phone);
+          await prefs.setString('name', name);
+          await prefs.setString('password', password);
+          _checkLogin();
+        }
       } else {
-        await prefs.setString('phone', phone);
-        await prefs.setString('name', name);
-        await prefs.setString('password', password);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MainLayout()),
-        );
+        print("Error reason: ${response.reasonPhrase}");
+        _showDialog("ผิดพลาด",
+            "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ (${response.statusCode})");
       }
     } catch (e) {
       _showDialog("ผิดพลาด", "เกิดข้อผิดพลาดในการเชื่อมต่อ");
-      print(e);
+      print("Exception: $e");
     }
   }
 
@@ -191,6 +192,49 @@ class _SignUpState extends State<SignUp> {
         ],
       ),
     );
+  }
+
+  Future<void> _checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final phone = prefs.getString('phone');
+    final password = prefs.getString('password');
+    final endpoint = prefs.getString('endpoint');
+
+    double currentLat = 13.7563;
+    double currentLng = 100.5018;
+
+    await prefs.setDouble('lat', currentLat);
+    await prefs.setDouble('lng', currentLng);
+
+    if (token != null || phone != null || password != null) {
+      try {
+        final url = Uri.parse('$endpoint/api/auth/token');
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'phone': phone,
+            'password': password,
+          }),
+        );
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          await prefs.setString('token', data['token']);
+          setState(() {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MainLayout()),
+            );
+          });
+          return;
+        } else {
+          await prefs.clear();
+        }
+      } catch (e) {
+        debugPrint('Login check error: $e');
+      }
+    }
   }
 
   @override

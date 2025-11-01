@@ -4,6 +4,7 @@ import 'package:my_flutter_mapwash/Home/home.dart';
 import 'package:my_flutter_mapwash/Oders/sendwash.dart';
 import 'package:my_flutter_mapwash/Profile/API/api_profile.dart';
 import 'package:my_flutter_mapwash/Profile/profile.dart';
+import 'package:my_flutter_mapwash/Scan/scan.dart';
 import 'package:my_flutter_mapwash/Wallet/wallet.dart';
 import 'package:my_flutter_mapwash/Status/status.dart';
 import 'package:my_flutter_mapwash/Header/header.dart';
@@ -46,7 +47,7 @@ class _MainLayoutState extends State<MainLayout> {
     List<Widget> _pages = [
       home(),
       wallet(),
-      profile(),
+      Scan(),
       sendwash(),
       // LocationPickerPage(onLocationPicked: (address, location) => {}),
       Status(),
