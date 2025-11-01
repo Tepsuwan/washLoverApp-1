@@ -149,7 +149,7 @@ class _SignUpState extends State<SignUp> {
       }
 
       final response = await http.post(
-        Uri.parse("$endpoint/api/register"),
+        Uri.parse("https://members.washlover.com/api/register"),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           "phone": phone,
