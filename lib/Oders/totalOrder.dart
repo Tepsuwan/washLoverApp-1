@@ -95,6 +95,20 @@ class _TotalOrderState extends State<TotalOrder> {
       "quantity": "3",
       "image": "assets/images/water01.png"
     },
+    {
+      "name": "หมายเหตุ",
+      "detail": "ให้ลูกค้าไปรับหน้าตึงมิสทีน",
+      "price": "",
+      "quantity": "",
+      "image": ""
+    },
+     {
+      "name": "คูปองส่วนลด",
+      "detail": "คูปองส่วนลด 5 บาท",
+      "price": "5",
+      "quantity": "",
+      "image": ""
+    },
   ];
 
   Future<void> _send_update_location() async {

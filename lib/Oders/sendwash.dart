@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_mapwash/Oders/API/api_sendwash.dart';
+import 'package:my_flutter_mapwash/Oders/Share/shareorder.dart';
 import 'package:my_flutter_mapwash/Oders/address_user.dart';
 import 'package:my_flutter_mapwash/Oders/location_helper.dart';
 import 'package:my_flutter_mapwash/Oders/totalOrder.dart';
@@ -224,8 +225,6 @@ class _sendwashState extends State<sendwash> {
             ),
           ),
         ),
-
-        // ✅ GridView แบบจำกัดความสูง (ใช้ใน Column ได้)
         Expanded(
           child: GridView.builder(
             padding: EdgeInsets.all(10),
@@ -245,6 +244,7 @@ class _sendwashState extends State<sendwash> {
                   setState(() {
                     selectedOptions['clothingType'] = item['value'];
                   });
+                  print(item);
                 },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

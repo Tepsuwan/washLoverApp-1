@@ -15,7 +15,7 @@ class SharePrefs {
   static Future<List<Map<String, dynamic>>> getItems() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(keyItems);
-    if (jsonString == null) return []; // ถ้าไม่มีข้อมูล ให้ส่งกลับเป็น list ว่าง
+    if (jsonString == null) return [];
     final List decoded = jsonDecode(jsonString);
     return List<Map<String, dynamic>>.from(decoded);
   }
