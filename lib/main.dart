@@ -42,29 +42,32 @@ class _MyAppState extends State<MyApp> {
     await prefs.setDouble('lat', currentLat);
     await prefs.setDouble('lng', currentLng);
 
-    if (token != null && phone != null && password != null) {
-      try {
-        final url = Uri.parse('$endpoint/api/auth/token');
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'phone': phone,
-            'password': password,
-          }),
-        );
-        if (response.statusCode == 200) {
-          setState(() {
-            _startScreen = const MainLayout();
-          });
-          return;
-        } else {
-          await prefs.clear();
-        }
-      } catch (e) {
-        debugPrint('Login check error: $e');
+    // if (token != null && phone != null && password != null) {
+    try {
+      final url = Uri.parse('$endpoint/api/auth/token');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'phone': phone,
+          'password': password,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final token = data['token'];
+        await prefs.setString('token', token);
+        setState(() {
+          _startScreen = const MainLayout();
+        });
+        return;
+      } else {
+        await prefs.clear();
       }
+    } catch (e) {
+      debugPrint('Login check error: $e');
     }
+    // }
 
     setState(() {
       _startScreen = LoginPage();

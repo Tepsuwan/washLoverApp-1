@@ -40,6 +40,7 @@ class _SignInState extends State<SignIn> {
     final password = _passwordController.text.trim();
     final prefs = await SharedPreferences.getInstance();
     final endpoint = prefs.getString('endpoint');
+    //  prefs.clear();
     if (phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
@@ -69,6 +70,7 @@ class _SignInState extends State<SignIn> {
           await prefs.setString('token', token);
           await prefs.setString('phone', phone);
           await prefs.setString('password', password);
+          // prefs.clear();
           print('prefs: $token');
           Navigator.pushReplacement(
             context,

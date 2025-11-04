@@ -44,6 +44,7 @@ class _sendwashState extends State<sendwash> {
   void initState() {
     super.initState();
     _geoLocator();
+    // _loadSelectedItem();
   }
 
   @override
@@ -130,15 +131,43 @@ class _sendwashState extends State<sendwash> {
     }
   }
 
-  void _updateQuantity(String key, String itemId, int change) {
+  void _updateQuantity(
+    String key,
+    String itemId,
+    int change,
+    Map<String, dynamic> item, {
+    int select = 5,
+  }) {
     setState(() {
-      if (!selectedOptions[key].containsKey(itemId)) {
-        selectedOptions[key][itemId] = 0;
+      selectedOptions.putIfAbsent(key, () => {});
+
+      if (select == 1) {
+        // เลือกได้ตัวเดียว → reset ตัวอื่น ๆ ก่อน
+        selectedOptions[key]!.clear();
+        if (change > 0) {
+          selectedOptions[key]![itemId] = 1; // เลือกตัวนี้ 1 ตัว
+        }
+      } else {
+        // เลือกได้หลายตัว
+        selectedOptions[key]!.putIfAbsent(itemId, () => 0);
+        int currentQuantity = selectedOptions[key]![itemId] ?? 0;
+        int newQuantity = (currentQuantity + change).clamp(0, 99);
+
+        if (newQuantity == 0) {
+          selectedOptions[key]!.remove(itemId);
+        } else {
+          selectedOptions[key]![itemId] = newQuantity;
+        }
       }
-      int currentQuantity = selectedOptions[key][itemId] is int
-          ? selectedOptions[key][itemId]
-          : 0;
-      selectedOptions[key][itemId] = (currentQuantity + change).clamp(0, 99);
+    });
+    select == 5;
+    _saveSelectedItem({
+      'id': item['id'], // ใช้ id เพื่อเช็คซ้ำ
+      'name': item['name'],
+      'image': item['image'],
+      'type': item['type'],
+      'quantity': selectedOptions[key]![item['id']] ?? 0,
+      'branch': closestBranch,
     });
   }
 
@@ -172,6 +201,21 @@ class _sendwashState extends State<sendwash> {
     } catch (e) {
       print("❌ เกิดข้อผิดพลาดใน _geoLocator: $e");
     }
+  }
+
+  /// ✅ โหลดข้อมูลที่เลือกจาก SharedPreferences
+  Future<void> _loadSelectedItem() async {
+    final savedItems = await SharePrefs.getItems();
+    if (savedItems.isNotEmpty) {
+      setState(() {
+        selectedOptions = savedItems.first; // สมมติบันทึกไว้แค่ตัวเดียว
+      });
+    }
+  }
+
+  /// ✅ เมื่อผู้ใช้กดเลือกแล้วบันทึก
+  Future<void> _saveSelectedItem(Map<String, dynamic> item) async {
+    await SharePrefs.saveItems([item]);
   }
 
   Widget _buildClothingType() {
@@ -244,7 +288,12 @@ class _sendwashState extends State<sendwash> {
                   setState(() {
                     selectedOptions['clothingType'] = item['value'];
                   });
-                  print(item);
+                  _saveSelectedItem({
+                    'clothingType': item['value'],
+                    'name': item['name'],
+                    'image': item['image'],
+                    'branch': closestBranch,
+                  });
                 },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -345,7 +394,7 @@ class _sendwashState extends State<sendwash> {
       itemBuilder: (context, index) {
         var item = options[index];
         int quantity = selectedOptions[key]?[item['id']] ?? 0;
-
+        print(item);
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -428,7 +477,7 @@ class _sendwashState extends State<sendwash> {
                       color: quantity > 0 ? Colors.red : Colors.grey,
                     ),
                     onPressed: quantity > 0
-                        ? () => _updateQuantity(key, item['id'], -1)
+                        ? () => _updateQuantity(key, item['id'], -1, item)
                         : null,
                   ),
                   Text(quantity.toString()),
@@ -437,7 +486,7 @@ class _sendwashState extends State<sendwash> {
                       Icons.add,
                       color: Colors.green,
                     ),
-                    onPressed: () => _updateQuantity(key, item['id'], 1),
+                    onPressed: () => _updateQuantity(key, item['id'], 1, item),
                   ),
                 ],
               ),

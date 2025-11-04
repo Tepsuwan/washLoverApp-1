@@ -17,6 +17,8 @@ class SharePrefs {
     final jsonString = prefs.getString(keyItems);
     if (jsonString == null) return [];
     final List decoded = jsonDecode(jsonString);
+    print("✅ Decoded items count: ${decoded.length}");
+    print("🧾 Items detail: ${jsonEncode(decoded)}");
     return List<Map<String, dynamic>>.from(decoded);
   }
 
