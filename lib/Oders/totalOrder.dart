@@ -57,59 +57,70 @@ class _TotalOrderState extends State<TotalOrder> {
   @override
   void initState() {
     super.initState();
+    loadCart();
   }
 
   List<Map<String, dynamic>> items = [
-    {
-      "name": "เครื่องซักผ้า",
-      "detail": "ขนาด 16 km.",
-      "price": "50",
-      "quantity": "2",
-      "image": "assets/images/sakpa.png"
-    },
-    {
-      "name": "เครื่องอบผ้า",
-      "detail": "ขนาด 16 km.",
-      "price": "70",
-      "quantity": "1",
-      "image": "assets/images/ooppa2.png"
-    },
-    {
-      "name": "น้ำยาซักผ้า",
-      "detail": "น้ำยาซักผ้าอย่างอ่อนโยน",
-      "price": "120",
-      "quantity": "1",
-      "image": "assets/images/notag.png"
-    },
-    {
-      "name": "น้ำยาปรับผ้านุ่ม",
-      "detail": "น้ำยาอย่างอ่อนโยน",
-      "price": "30",
-      "quantity": "3",
-      "image": "assets/images/notag.png"
-    },
-    {
-      "name": "อุณหภูมิน้ำ",
-      "detail": "อุณหภูมิน้ำเย็น",
-      "price": "30",
-      "quantity": "3",
-      "image": "assets/images/water01.png"
-    },
-    {
-      "name": "หมายเหตุ",
-      "detail": "ให้ลูกค้าไปรับหน้าตึงมิสทีน",
-      "price": "",
-      "quantity": "",
-      "image": ""
-    },
-     {
-      "name": "คูปองส่วนลด",
-      "detail": "คูปองส่วนลด 5 บาท",
-      "price": "5",
-      "quantity": "",
-      "image": ""
-    },
+    // {
+    //   "name": "เครื่องซักผ้า",
+    //   "detail": "ขนาด 16 km.",
+    //   "price": "50",
+    //   "quantity": "2",
+    //   "image": "assets/images/sakpa.png"
+    // },
+    // {
+    //   "name": "เครื่องอบผ้า",
+    //   "detail": "ขนาด 16 km.",
+    //   "price": "70",
+    //   "quantity": "1",
+    //   "image": "assets/images/ooppa2.png"
+    // },
+    // {
+    //   "name": "น้ำยาซักผ้า",
+    //   "detail": "น้ำยาซักผ้าอย่างอ่อนโยน",
+    //   "price": "120",
+    //   "quantity": "1",
+    //   "image": "assets/images/notag.png"
+    // },
+    // {
+    //   "name": "น้ำยาปรับผ้านุ่ม",
+    //   "detail": "น้ำยาอย่างอ่อนโยน",
+    //   "price": "30",
+    //   "quantity": "3",
+    //   "image": "assets/images/notag.png"
+    // },
+    // {
+    //   "name": "อุณหภูมิน้ำ",
+    //   "detail": "อุณหภูมิน้ำเย็น",
+    //   "price": "30",
+    //   "quantity": "3",
+    //   "image": "assets/images/water01.png"
+    // },
+    // {
+    //   "name": "หมายเหตุ",
+    //   "detail": "ให้ลูกค้าไปรับหน้าตึงมิสทีน",
+    //   "price": "",
+    //   "quantity": "",
+    //   "image": ""
+    // },
+    // {
+    //   "name": "คูปองส่วนลด",
+    //   "detail": "คูปองส่วนลด 5 บาท",
+    //   "price": "5",
+    //   "quantity": "",
+    //   "image": ""
+    // },
   ];
+
+ void loadCart() async {
+    // ดึงข้อมูลจาก API
+    List<Map<String, dynamic>> apiItems = (await ApiGetCart.getCart()) as List<Map<String, dynamic>>;
+
+    setState(() {
+      // ถ้า API มีข้อมูล ใช้ข้อมูล API, ถ้าไม่มีก็ใช้ fallback ของเดิม
+      items = apiItems.isNotEmpty ? apiItems : items;
+    });
+  }
 
   Future<void> _send_update_location() async {
     try {
@@ -124,8 +135,7 @@ class _TotalOrderState extends State<TotalOrder> {
       if (success) {
         print(lat);
         print(lng);
-      } else {
-      }
+      } else {}
     } catch (e) {
       print('Error loading history: $e');
     }

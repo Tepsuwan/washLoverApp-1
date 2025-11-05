@@ -553,6 +553,8 @@ class _sendwashState extends State<sendwash> {
               setState(() {
                 selectedOptions['note'] = value;
               });
+              List<Map<String, dynamic>> items = [selectedOptions];
+              APICartSet.sendCartToSet(items);
             },
             decoration: InputDecoration(
               border: OutlineInputBorder(),
