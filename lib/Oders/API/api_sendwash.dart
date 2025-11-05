@@ -8,6 +8,7 @@ class API_sendwash {
       {
         'image': 'assets/images/pha1.jpg',
         'name': 'เสื้อผ้า',
+        'detail': 'เสื้อผ้า',
         'value': 1,
         'quantity': 0,
         'text': '0',
@@ -16,6 +17,7 @@ class API_sendwash {
       {
         'image': 'assets/images/nuam.png',
         'name': 'ชุดเครื่องนอน/ผ้านวม',
+        'detail': 'ชุดเครื่องนอน/ผ้านวม',
         'value': 2,
         'quantity': 0,
         'text': '1',
@@ -30,7 +32,7 @@ class API_sendwash {
         'id': 'sample_${index + 1}',
         'name': 'น้ำยาซัก&ปรับผ้านุ่ม',
         'image': 'assets/images/notag.png',
-        'price': 5,
+        'price': 5 + index,
         'type': type,
       };
     });
@@ -60,9 +62,9 @@ class API_sendwash {
 
       return {
         'id': 'sample_${index + 1}',
-        'name': typeselect,
+        'name': typeselect+index.toString(),
         'image': sampleImage,
-        'price': 40,
+        'price': 40 + index,
         'type': type,
       };
     });

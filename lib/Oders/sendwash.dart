@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_mapwash/Oders/API/api_sendwash.dart';
-import 'package:my_flutter_mapwash/Oders/Share/shareorder.dart';
+import 'package:my_flutter_mapwash/Oders/API/api_saveorder.dart';
 import 'package:my_flutter_mapwash/Oders/address_user.dart';
 import 'package:my_flutter_mapwash/Oders/location_helper.dart';
 import 'package:my_flutter_mapwash/Oders/totalOrder.dart';
@@ -135,39 +135,20 @@ class _sendwashState extends State<sendwash> {
     String key,
     String itemId,
     int change,
-    Map<String, dynamic> item, {
-    int select = 5,
-  }) {
+  ) {
     setState(() {
       selectedOptions.putIfAbsent(key, () => {});
 
-      if (select == 1) {
-        // เลือกได้ตัวเดียว → reset ตัวอื่น ๆ ก่อน
-        selectedOptions[key]!.clear();
-        if (change > 0) {
-          selectedOptions[key]![itemId] = 1; // เลือกตัวนี้ 1 ตัว
-        }
-      } else {
-        // เลือกได้หลายตัว
-        selectedOptions[key]!.putIfAbsent(itemId, () => 0);
-        int currentQuantity = selectedOptions[key]![itemId] ?? 0;
-        int newQuantity = (currentQuantity + change).clamp(0, 99);
+      // เลือกได้หลายตัว
+      selectedOptions[key]!.putIfAbsent(itemId, () => 0);
+      int currentQuantity = selectedOptions[key]![itemId] ?? 0;
+      int newQuantity = (currentQuantity + change).clamp(0, 99);
 
-        if (newQuantity == 0) {
-          selectedOptions[key]!.remove(itemId);
-        } else {
-          selectedOptions[key]![itemId] = newQuantity;
-        }
+      if (newQuantity == 0) {
+        selectedOptions[key]!.remove(itemId);
+      } else {
+        selectedOptions[key]![itemId] = newQuantity;
       }
-    });
-    select == 5;
-    _saveSelectedItem({
-      'id': item['id'], // ใช้ id เพื่อเช็คซ้ำ
-      'name': item['name'],
-      'image': item['image'],
-      'type': item['type'],
-      'quantity': selectedOptions[key]![item['id']] ?? 0,
-      'branch': closestBranch,
     });
   }
 
@@ -203,26 +184,10 @@ class _sendwashState extends State<sendwash> {
     }
   }
 
-  /// ✅ โหลดข้อมูลที่เลือกจาก SharedPreferences
-  Future<void> _loadSelectedItem() async {
-    final savedItems = await SharePrefs.getItems();
-    if (savedItems.isNotEmpty) {
-      setState(() {
-        selectedOptions = savedItems.first; // สมมติบันทึกไว้แค่ตัวเดียว
-      });
-    }
-  }
-
-  /// ✅ เมื่อผู้ใช้กดเลือกแล้วบันทึก
-  Future<void> _saveSelectedItem(Map<String, dynamic> item) async {
-    await SharePrefs.saveItems([item]);
-  }
-
   Widget _buildClothingType() {
     // ✅ ดึงข้อมูลประเภทเสื้อผ้า
     List<Map<String, dynamic>> clothingTypes =
         API_sendwash().getClothingTypes();
-
     return Column(
       children: [
         // ✅ ที่อยู่ (GestureDetector)
@@ -288,12 +253,8 @@ class _sendwashState extends State<sendwash> {
                   setState(() {
                     selectedOptions['clothingType'] = item['value'];
                   });
-                  _saveSelectedItem({
-                    'clothingType': item['value'],
-                    'name': item['name'],
-                    'image': item['image'],
-                    'branch': closestBranch,
-                  });
+                  List<Map<String, dynamic>> items = [item];
+                  APICartSet.sendCartToSet(items);
                 },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -394,7 +355,6 @@ class _sendwashState extends State<sendwash> {
       itemBuilder: (context, index) {
         var item = options[index];
         int quantity = selectedOptions[key]?[item['id']] ?? 0;
-        print(item);
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -477,7 +437,7 @@ class _sendwashState extends State<sendwash> {
                       color: quantity > 0 ? Colors.red : Colors.grey,
                     ),
                     onPressed: quantity > 0
-                        ? () => _updateQuantity(key, item['id'], -1, item)
+                        ? () => _updateQuantity(key, item['id'], -1)
                         : null,
                   ),
                   Text(quantity.toString()),
@@ -486,7 +446,7 @@ class _sendwashState extends State<sendwash> {
                       Icons.add,
                       color: Colors.green,
                     ),
-                    onPressed: () => _updateQuantity(key, item['id'], 1, item),
+                    onPressed: () => _updateQuantity(key, item['id'], 1),
                   ),
                 ],
               ),
@@ -522,6 +482,8 @@ class _sendwashState extends State<sendwash> {
               selectedOptions[key] = item['id'];
               selectedItems[item['id']] = item;
             });
+            List<Map<String, dynamic>> items = [item];
+            APICartSet.sendCartToSet(items);
           },
           child: Container(
             decoration: BoxDecoration(
