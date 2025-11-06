@@ -45,7 +45,7 @@ class ApiPost {
 
 class ApiGetCart {
   /// คืนค่า List ของ cart items หรือ [] ถ้าเกิดข้อผิดพลาด
-  static Future<List<Map<String, dynamic>>> getCart() async {
+  static Future<List<dynamic>> getCart() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token') ?? '';
     String endpoint = prefs.getString('endpoint') ?? '';
@@ -66,13 +66,19 @@ class ApiGetCart {
         },
       );
 
-      if (response.statusCode == 200) {
+     if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return List<Map<String, dynamic>>.from(data['cart']);
+        if (data is List) {
+          return data;
+        } else if (data is Map && data['items'] != null) {
+          return data['items'];
+        } else {
+          return [];
+        }
       } else {
-        print("Error: ${response.statusCode} - ${response.reasonPhrase}");
+        print("Error: ${response.statusCode}");
+        return [];
       }
-      return [];
     } catch (e) {
       print("Exception: $e");
       return [];

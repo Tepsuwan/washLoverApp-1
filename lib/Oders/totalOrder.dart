@@ -57,69 +57,24 @@ class _TotalOrderState extends State<TotalOrder> {
   @override
   void initState() {
     super.initState();
-    loadCart();
+    _loadCart();
   }
 
-  List<Map<String, dynamic>> items = [
-    // {
-    //   "name": "เครื่องซักผ้า",
-    //   "detail": "ขนาด 16 km.",
-    //   "price": "50",
-    //   "quantity": "2",
-    //   "image": "assets/images/sakpa.png"
-    // },
-    // {
-    //   "name": "เครื่องอบผ้า",
-    //   "detail": "ขนาด 16 km.",
-    //   "price": "70",
-    //   "quantity": "1",
-    //   "image": "assets/images/ooppa2.png"
-    // },
-    // {
-    //   "name": "น้ำยาซักผ้า",
-    //   "detail": "น้ำยาซักผ้าอย่างอ่อนโยน",
-    //   "price": "120",
-    //   "quantity": "1",
-    //   "image": "assets/images/notag.png"
-    // },
-    // {
-    //   "name": "น้ำยาปรับผ้านุ่ม",
-    //   "detail": "น้ำยาอย่างอ่อนโยน",
-    //   "price": "30",
-    //   "quantity": "3",
-    //   "image": "assets/images/notag.png"
-    // },
-    // {
-    //   "name": "อุณหภูมิน้ำ",
-    //   "detail": "อุณหภูมิน้ำเย็น",
-    //   "price": "30",
-    //   "quantity": "3",
-    //   "image": "assets/images/water01.png"
-    // },
-    // {
-    //   "name": "หมายเหตุ",
-    //   "detail": "ให้ลูกค้าไปรับหน้าตึงมิสทีน",
-    //   "price": "",
-    //   "quantity": "",
-    //   "image": ""
-    // },
-    // {
-    //   "name": "คูปองส่วนลด",
-    //   "detail": "คูปองส่วนลด 5 บาท",
-    //   "price": "5",
-    //   "quantity": "",
-    //   "image": ""
-    // },
-  ];
-
- void loadCart() async {
-    // ดึงข้อมูลจาก API
-    List<Map<String, dynamic>> apiItems = (await ApiGetCart.getCart()) as List<Map<String, dynamic>>;
-
-    setState(() {
-      // ถ้า API มีข้อมูล ใช้ข้อมูล API, ถ้าไม่มีก็ใช้ fallback ของเดิม
-      items = apiItems.isNotEmpty ? apiItems : items;
-    });
+  List<Map<String, dynamic>> items = [];
+  Future<void> _loadCart() async {
+    try {
+      final data = await ApiGetCart.getCart();
+      setState(() {
+        if (data.isNotEmpty) {
+          items = List<Map<String, dynamic>>.from(data);
+        } else {
+          items = [];
+        }
+      });
+    } catch (e) {
+      print('Error loading cart: $e');
+      setState(() => items = []);
+    }
   }
 
   Future<void> _send_update_location() async {
@@ -245,13 +200,13 @@ class _TotalOrderState extends State<TotalOrder> {
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
               itemCount: items.length,
               itemBuilder: (context, index) {
-                var item = items[index];
+                final item = items[index];
                 double price = double.tryParse(item['price'].toString()) ?? 0.0;
-                int quantity = int.tryParse(item['quantity'].toString()) ?? 0;
+                int quantity = int.tryParse(item['quantity'].toString()) ?? 1;
                 String imageUrl = item['image'];
                 return OrderCard(
                   title: item['name'],
-                  subtitle: item['detail'],
+                  subtitle: item['detail'] ?? 'ไม่พบรายละเอียด',
                   price: item['price'].toString(),
                   image: imageUrl,
                   quantity: quantity, // ✅ ใช้ตัวที่แปลงเป็น int แล้ว
@@ -335,7 +290,7 @@ class _TotalOrderState extends State<TotalOrder> {
                           color: Color.fromARGB(255, 155, 155, 155)),
                     ),
                     Text(
-                      "฿0.00",
+                      "฿",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

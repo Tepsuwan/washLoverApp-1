@@ -267,8 +267,9 @@ class _realtime_statusState extends State<realtime_status> {
 
   // ฟังก์ชันหลักสำหรับดึงเส้นทางจาก API
   Future<void> _drawRoute() async {
-    final directionsService =
-        DirectionsService(googleApiKey: 'AIzaSyDEds_3tBG5jdPMRLZyBl1EJFo196mjNgs'); // ใส่ API Key ของคุณ
+    final directionsService = DirectionsService(
+        googleApiKey:
+            'AIzaSyDEds_3tBG5jdPMRLZyBl1EJFo196mjNgs'); // ใส่ API Key ของคุณ
     List<LatLng> routePoints = await directionsService.getRouteCoordinates(
       startLat: _latdri,
       startLng: _longdri,
@@ -305,9 +306,11 @@ class _realtime_statusState extends State<realtime_status> {
   Future<void> fetchRealtimeStatus() async {
     final apiCustomer = ApistatusRealtime();
     final apiDriver = ApistatusDriver();
+    final apiDetail = ApiDetail();
     final data = await apiCustomer.StReal(widget.deviceId, widget.id);
     final dtDri = await apiDriver.stDriver(widget.deviceId, widget.id);
-
+    final dtDetail = await apiDetail.stDetail(widget.deviceId, widget.id);
+   
     if (data != null) {
       setState(() {
         _lat = data['latitude'];

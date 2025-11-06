@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApistatusRealtime {
-  Future<Map<String, dynamic>?> StReal(
-      String deviceId, String id) async {
+  Future<Map<String, dynamic>?> StReal(String deviceId, String id) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final endpoint = prefs.getString('endpoint');
@@ -36,13 +35,13 @@ class ApistatusRealtime {
 }
 
 class ApistatusDriver {
-  Future<Map<String, dynamic>?> stDriver(
-      String deviceId, String id) async {
+  Future<Map<String, dynamic>?> stDriver(String deviceId, String id) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final endpoint = prefs.getString('endpoint');
 
-    final url = Uri.parse('$endpoint/api/get_last_location?device_id=$deviceId');
+    final url =
+        Uri.parse('$endpoint/api/get_last_location?device_id=$deviceId');
 
     try {
       final response = await http.get(
@@ -56,6 +55,35 @@ class ApistatusDriver {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         return data;
+      } else {
+        print(
+            '⚠️ [$id] Error: ${response.statusCode} (${response.reasonPhrase})');
+        return null;
+      }
+    } catch (e) {
+      print('❌ [$id] Error fetching destination status: $e');
+      return null;
+    }
+  }
+}
+
+class ApiDetail {
+  Future<Map<String, dynamic>?> stDetail(String deviceId, String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final endpoint = prefs.getString('endpoint');
+    final url = Uri.parse('$endpoint/api/cart/0987654322');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['items'];
       } else {
         print(
             '⚠️ [$id] Error: ${response.statusCode} (${response.reasonPhrase})');
