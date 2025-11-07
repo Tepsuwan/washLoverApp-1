@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:my_flutter_mapwash/Oders/API/api_saveorder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiPost {
@@ -24,11 +25,24 @@ class ApiPost {
           "longitude": lng,
         }),
       );
-
-      print('Response: ${response.body}');
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        await APICartSet.sendCartOk(
+          "${data['device_id']}",
+          [
+            {
+              "product_id": 101,
+              "quantity": 2,
+              "price": 99.0,
+            },
+            {
+              "product_id": 102,
+              "quantity": 1,
+              "price": 199.0,
+            },
+          ],
+        );
+        deleteCart();
         if (data['status'] == 'success') {
           return true;
         }
@@ -38,6 +52,41 @@ class ApiPost {
       return false;
     } catch (e) {
       print("Exception: $e");
+      return false;
+    }
+  }
+
+  static Future<bool> deleteCart() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    String endpoint = prefs.getString('endpoint') ?? '';
+    String phone = prefs.getString('phone') ?? '';
+
+    if (token.isEmpty || endpoint.isEmpty || phone.isEmpty) {
+      print("Missing required data in SharedPreferences");
+      return false;
+    }
+
+    try {
+      final uri = Uri.parse("$endpoint/api/cart/$phone");
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        print("Item deleted successfully");
+        return true;
+      } else {
+        print("Delete failed with status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Exception while deleting cart item: $e");
       return false;
     }
   }
@@ -66,7 +115,7 @@ class ApiGetCart {
         },
       );
 
-     if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data is List) {
           return data;

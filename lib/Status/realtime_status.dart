@@ -7,6 +7,7 @@ import 'package:my_flutter_mapwash/DirectionMap/direction_map.dart';
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
+import 'package:my_flutter_mapwash/Profile/API/api_profile.dart';
 import 'package:my_flutter_mapwash/Status/API/api_realtime_status.dart';
 import 'dart:math'; // เพิ่มการนำเข้าคลาส dart:math
 import 'dart:ui' as ui;
@@ -31,10 +32,8 @@ class _realtime_statusState extends State<realtime_status> {
   String travelTime = 'สถานะ';
   Set<Polyline> _polylines = {};
   late GoogleMapController _mapController;
-
   Set<Marker> _markers = {};
-
-  Map<String, dynamic>? _orderDetails;
+  Map<String, dynamic> profileData = {};
 
   Timer? _timer;
 
@@ -88,109 +87,7 @@ class _realtime_statusState extends State<realtime_status> {
     'return_success',
   ];
 
-  Map<String, dynamic> orderDetails = {
-    "branch": {
-      "address":
-          "ปาก ซ. เคหะร่มเกล้า 64 แขวงคลองสองต้นนุ่น เขตลาดกระบัง กรุงเทพมหานคร 10520",
-      "branch": "สาขาคุณส้มร่มเกล้า60",
-      "code": "WASHLOVER03",
-      "latitude": "13.766100",
-      "longitude": "100.722459",
-      "name": "สาขาคุณส้มร่มเกล้า60"
-    },
-    "code": "WL504052635n0V6i",
-    "datetime": "2025-04-05 17:26:35",
-    "driverback": {
-      "date_end": "2025-05-08 15:55:34",
-      "date_start": "2025-05-08 14:14:51",
-      "latitude": "13.772925",
-      "longitude": "100.70642",
-      "name": "Wirun khomsai",
-      "phone": "0933697840",
-      "status": "send_return",
-      "username": "0933697840"
-    },
-    "driverfirst": {
-      "date_end": "2025-04-30 11:54:28",
-      "date_start": "2025-04-30 11:54:01",
-      "latitude": "13.7731941",
-      "longitude": "100.7057937",
-      "name": "Wirun khomsai",
-      "phone": "0933697840",
-      "status": "completed",
-      "username": "0933697840"
-    },
-    "image": "https://washlover.com/image/logo.png?v=6",
-    "name": "wi",
-    "note": "",
-    "order_selects": [
-      {
-        "code": "PD2999343453",
-        "detail": "เอสเซ้นส์ คลีน แอนด์ แคร์",
-        "id": "79",
-        "image": "assets/images/notag.png",
-        "name": "เอสเซ้นส์ คลีน แอนด์ แคร์",
-        "price": "5.00",
-        "quantity": 2,
-        "type": "detergent"
-      },
-      {
-        "code": "PD1652982682",
-        "detail": "ดาวน์นี่ สวนดอกไม้ผลิ",
-        "id": "83",
-        "image": "assets/images/notag.png",
-        "name": "ดาวน์นี่ สวนดอกไม้ผลิ",
-        "price": "5.00",
-        "quantity": 2,
-        "type": "softener"
-      },
-      {
-        "code": "PD5540564541",
-        "detail": "ขนาด 12 kg.",
-        "id": "88",
-        "image": "assets/images/sakpa.png",
-        "name": "ขนาด 12 kg.",
-        "price": "40.00",
-        "quantity": 1,
-        "type": "washing"
-      },
-      {
-        "code": "PD3251613700",
-        "detail": "น้ำเย็น (COOL) +0 บาท",
-        "id": "76",
-        "image": "assets/images/water03.png",
-        "name": "น้ำเย็น (COOL) +0 บาท",
-        "price": "0.00",
-        "quantity": 1,
-        "type": "temperature"
-      },
-      {
-        "code": "PD6425321185",
-        "detail": "ขนาด 16 kg. 32 นาที",
-        "id": "74",
-        "image": "assets/images/ooppa2.png",
-        "name": "ขนาด 16 kg.",
-        "price": "40.00",
-        "quantity": 1,
-        "type": "dryer"
-      }
-    ],
-    "phone": "0611211910",
-    "price_discount": "99",
-    "price_sum": "1.00",
-    "status": "send_return",
-    "user_location": {
-      "detail": "",
-      "district": "อำเภอบางพลี",
-      "latitude": "13.676105",
-      "longitude": "100.71839",
-      "name": "Wash",
-      "phone": "0611211910",
-      "postcode": "10540",
-      "province": "สมุทรปราการ",
-      "subdistrict": "ตำบลราชาเทวะ"
-    }
-  };
+  List<Map<String, dynamic>> _orderDetails = [];
 
   String? currentStatus;
   String? statusDescription;
@@ -199,6 +96,8 @@ class _realtime_statusState extends State<realtime_status> {
   void initState() {
     super.initState();
     startRealtimeUpdates();
+    getDetal();
+    _loadProfile();
   }
 
   @override
@@ -303,14 +202,17 @@ class _realtime_statusState extends State<realtime_status> {
     }
   }
 
+  Future<void> getDetal() async {
+    final apiDetail = ApiDetail();
+    final dtDetail = await apiDetail.stDetail(widget.deviceId, widget.id);
+    _orderDetails = dtDetail as List<Map<String, dynamic>>;
+  }
+
   Future<void> fetchRealtimeStatus() async {
     final apiCustomer = ApistatusRealtime();
     final apiDriver = ApistatusDriver();
-    final apiDetail = ApiDetail();
     final data = await apiCustomer.StReal(widget.deviceId, widget.id);
     final dtDri = await apiDriver.stDriver(widget.deviceId, widget.id);
-    final dtDetail = await apiDetail.stDetail(widget.deviceId, widget.id);
-   
     if (data != null) {
       setState(() {
         _lat = data['latitude'];
@@ -331,9 +233,21 @@ class _realtime_statusState extends State<realtime_status> {
     }
   }
 
+  Future<void> _loadProfile() async {
+    try {
+      Map<String, dynamic> data = await api_profile.fetchProfile();
+      setState(() {
+        profileData = data;
+      });
+    } catch (e) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double totalBeforeDiscount = 0.0;
+      final member = profileData;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: headerOrder(
@@ -491,7 +405,7 @@ class _realtime_statusState extends State<realtime_status> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "0987654321 ",
+                                        member['phone'].toString(),
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       Text(
@@ -523,10 +437,12 @@ class _realtime_statusState extends State<realtime_status> {
                           padding: const EdgeInsets.all(12.0),
                           child: Column(
                             children: List.generate(
-                              orderDetails["order_selects"]?.length ?? 0,
+                              // orderDetails["order_selects"]?.length ?? 0,
+                              _orderDetails.length ?? 0,
                               (index) {
-                                final product =
-                                    orderDetails["order_selects"][index];
+                                // final product =
+                                //     orderDetails["order_selects"][index];
+                                final product = _orderDetails[index];
                                 return Column(
                                   children: [
                                     ListTile(
@@ -549,7 +465,7 @@ class _realtime_statusState extends State<realtime_status> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       subtitle: Text(
-                                        "จำนวน: ${product["qty"] ?? 0}",
+                                        "จำนวน: ${product["quantity"] ?? 0}",
                                         style: TextStyle(
                                             color: Colors.grey, fontSize: 13),
                                       ),

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_flutter_mapwash/Chat/chat.dart';
+import 'package:my_flutter_mapwash/Chat/test.dart';
 import 'package:my_flutter_mapwash/Status/API/api_status.dart';
 import 'package:my_flutter_mapwash/Status/realtime_status.dart';
 
@@ -121,28 +123,68 @@ class _StatusState extends State<Status> {
         });
       },
       child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: ListTile(
           leading: CircleAvatar(
             backgroundColor: color.withOpacity(0.2),
             child: Icon(icon, color: color),
           ),
           title: Text(title, style: const TextStyle(fontSize: 14)),
-          subtitle: Text(subtitle,
-              style: const TextStyle(fontSize: 13, color: Colors.grey)),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
+          subtitle: Text(
+            subtitle,
+            style: const TextStyle(fontSize: 13, color: Colors.grey),
+          ),
+
+          // ✅ เพิ่มไอคอน chat ที่ฝั่งขวา
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                amount,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.amber[500],
-                    fontSize: 16),
+              // จำนวนเงินและเวลา
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    amount,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber[500],
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    time,
+                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                ],
               ),
-              Text(time,
-                  style: const TextStyle(fontSize: 13, color: Colors.grey)),
+              const SizedBox(width: 8),
+              // ปุ่มไอคอนแชต
+              IconButton(
+                icon: const Icon(Icons.chat, color: Colors.blueAccent),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                          // chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
+                          // deviceId: device_id,
+                          // title: title,     // อาจใช้เป็นชื่อหัวแชต
+                          ),
+                    ),
+                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => ChatApp(
+                  //         // chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
+                  //         // deviceId: device_id,
+                  //         // title: title,     // อาจใช้เป็นชื่อหัวแชต
+                  //         ),
+                  //   ),
+                  // );
+                },
+              ),
             ],
           ),
         ),

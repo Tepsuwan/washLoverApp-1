@@ -7,9 +7,7 @@ class ApistatusRealtime {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final endpoint = prefs.getString('endpoint');
-
     final url = Uri.parse('$endpoint/api/get_destination?device_id=$deviceId');
-
     try {
       final response = await http.get(
         url,
@@ -18,7 +16,6 @@ class ApistatusRealtime {
           'Accept': 'application/json',
         },
       );
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         return data;
@@ -39,7 +36,6 @@ class ApistatusDriver {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final endpoint = prefs.getString('endpoint');
-
     final url =
         Uri.parse('$endpoint/api/get_last_location?device_id=$deviceId');
 
@@ -68,11 +64,11 @@ class ApistatusDriver {
 }
 
 class ApiDetail {
-  Future<Map<String, dynamic>?> stDetail(String deviceId, String id) async {
+  Future<List?> stDetail(String deviceId, String id) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final endpoint = prefs.getString('endpoint');
-    final url = Uri.parse('$endpoint/api/cart/0987654322');
+    final url = Uri.parse('$endpoint/api/cart/$deviceId');
     try {
       final response = await http.get(
         url,
@@ -81,14 +77,29 @@ class ApiDetail {
           'Accept': 'application/json',
         },
       );
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return data['items'];
+
+        if (data is Map && data['items'] is List) {
+          return List<Map<String, dynamic>>.from(data['items']);
+        } else {
+          print("⚠️ Unexpected response format: $data");
+          return [];
+        }
       } else {
-        print(
-            '⚠️ [$id] Error: ${response.statusCode} (${response.reasonPhrase})');
-        return null;
+        print('⚠️ Error: ${response.statusCode} (${response.reasonPhrase})');
+        return [];
       }
+
+      // if (response.statusCode == 200) {
+      //   final data = json.decode(response.body);
+      //   return data['items'];
+      // } else {
+      //   print(
+      //       '⚠️ [$id] Error: ${response.statusCode} (${response.reasonPhrase})');
+      //   return null;
+      // }
     } catch (e) {
       print('❌ [$id] Error fetching destination status: $e');
       return null;
