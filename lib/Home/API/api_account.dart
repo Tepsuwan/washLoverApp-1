@@ -1,11 +1,22 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class API_account {
   static Future<Map<String, dynamic>?> fetchapiaccount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    String endpoint = prefs.getString('endpoint') ?? '';
+
     try {
-      final url = Uri.parse("https://washlover-1bef6-default-rtdb.firebaseio.com/users.json");
-      final response = await http.get(url);
+      final response = await http.get(
+        Uri.parse("${endpoint}/api/member/profile"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonBody = json.decode(response.body);
         if (jsonBody.containsKey('data')) {
