@@ -13,7 +13,9 @@ class Header extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80),
         child: AppBar(
-          backgroundColor: Colors.white,
+          // backgroundColor: Color.fromRGBO(19, 108, 180, 1),
+          backgroundColor: Color(0xFF42A5F5),
+
           elevation: 0,
           flexibleSpace: SafeArea(
             child: Padding(
@@ -22,7 +24,7 @@ class Header extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // โลโก้
-                  Image.asset('assets/images/logo/Washlovercolor.png',
+                  Image.asset('assets/images/logo/Washloverwhite.png',
                       height: 60),
                   Row(
                     children: [

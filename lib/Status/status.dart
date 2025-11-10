@@ -166,7 +166,7 @@ class _StatusState extends State<Status> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ChatScreen(
+                      builder: (context) => MyApp2(
                           // chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
                           // deviceId: device_id,
                           // title: title,     // อาจใช้เป็นชื่อหัวแชต

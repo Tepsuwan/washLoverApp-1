@@ -21,237 +21,252 @@ class _homeState extends State<home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 12),
-            Container(
-              padding: EdgeInsets.all(20),
-              margin: EdgeInsets.symmetric(horizontal: 15), // ขยับด้านซ้าย-ขวา
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 250, 250, 250),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 5,
-                    spreadRadius: 0,
-                    offset: Offset(0, 0),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _walletItem2(
-                    Image.asset(
-                      "assets/images/collectionduck/Artboard14.png",
-                      width: 60,
-                      height: 60,
-                    ),
-                    "ยอดเงิน",
-                    "0฿",
-                  ),
-                  _walletItem(
-                      Image.asset(
-                        "assets/images/collectionduck/Artboard21copy5.png",
-                        width: 60,
-                        height: 60,
-                      ),
-                      "Points",
-                      "0"),
-                  _walletItem(
-                      Image.asset(
-                        "assets/images/collectionduck/Artboard17.png",
-                        width: 60,
-                        height: 60,
-                      ),
-                      "คูปอง",
-                      "0"),
-                  _duckItem(
-                      Image.asset(
-                        "assets/images/collectionduck/Artboard37copy8.png",
-                        width: 60,
-                        height: 60,
-                      ),
-                      "เก็บเวล",
-                      "0"),
-                ],
-              ),
-            ),
-
-            // Banner
-            SizedBox(height: 12),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: CarouselSlider(
-                  options: CarouselOptions(
-                    height: 180,
-                    autoPlay: true,
-                    viewportFraction: 0.9, // ลดระยะห่างระหว่างภาพ
-                  ),
-                  items: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Image.asset("assets/images/slid2.png",
-                          fit: BoxFit.cover),
-                    ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Image.asset("assets/images/slid3.png",
-                          fit: BoxFit.cover),
-                    ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Image.asset("assets/images/slid1.png",
-                          fit: BoxFit.cover),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF42A5F5),
+              Colors.white,
+            ],
+            stops: [0.1, 0.1], // ด้านบน 10% ฟ้า ด้านล่าง 90% ขาว
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(20),
+                margin:
+                    EdgeInsets.symmetric(horizontal: 15), // ขยับด้านซ้าย-ขวา
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 250, 250, 250),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 5,
+                      spreadRadius: 0,
+                      offset: Offset(0, 0),
                     ),
                   ],
                 ),
-              ),
-            ),
-            SizedBox(height: 12),
-
-            // Service Section Title
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 0),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 250, 250, 250),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start, // จัด Text ชิดซ้าย
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 16),
-                      child: Text(
-                        "บริการ",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                    _walletItem2(
+                      Image.asset(
+                        "assets/images/collectionduck/Artboard14.png",
+                        width: 60,
+                        height: 60,
                       ),
+                      "ยอดเงิน",
+                      "0฿",
                     ),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      children: [
-                        _menuItem(
-                          Image.asset(
-                            "assets/images/collectionduck/Artboard21copy12.png",
-                            width: 60,
-                            height: 60,
+                    _walletItem(
+                        Image.asset(
+                          "assets/images/collectionduck/Artboard21copy5.png",
+                          width: 60,
+                          height: 60,
+                        ),
+                        "Points",
+                        "0"),
+                    _walletItem(
+                        Image.asset(
+                          "assets/images/collectionduck/Artboard17.png",
+                          width: 60,
+                          height: 60,
+                        ),
+                        "คูปอง",
+                        "0"),
+                    _duckItem(
+                        Image.asset(
+                          "assets/images/collectionduck/Artboard37copy8.png",
+                          width: 60,
+                          height: 60,
+                        ),
+                        "เก็บเวล",
+                        "0"),
+                  ],
+                ),
+              ),
+
+              // Banner
+              SizedBox(height: 12),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      height: 180,
+                      autoPlay: true,
+                      viewportFraction: 0.9, // ลดระยะห่างระหว่างภาพ
+                    ),
+                    items: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: Image.asset("assets/images/slid2.png",
+                            fit: BoxFit.cover),
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: Image.asset("assets/images/slid3.png",
+                            fit: BoxFit.cover),
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: Image.asset("assets/images/slid1.png",
+                            fit: BoxFit.cover),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 12),
+
+              // Service Section Title
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 0),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 250, 250, 250),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start, // จัด Text ชิดซ้าย
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 16),
+                        child: Text(
+                          "บริการ",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        children: [
+                          _menuItem(
+                            Image.asset(
+                              "assets/images/collectionduck/Artboard21copy12.png",
+                              width: 60,
+                              height: 60,
+                            ),
+                            "ตัวฉัน",
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => profile()),
+                              );
+                            },
                           ),
-                          "ตัวฉัน",
-                          () {
+                          _menuItem(
+                              Image.asset(
+                                "assets/images/collectionduck/Artboard1copy4.png",
+                                width: 60,
+                                height: 60,
+                              ),
+                              "จุดบริการ", () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => profile()),
+                                  builder: (context) => location_banc()),
                             );
-                          },
-                        ),
-                        _menuItem(
-                            Image.asset(
-                              "assets/images/collectionduck/Artboard1copy4.png",
-                              width: 60,
-                              height: 60,
-                            ),
-                            "จุดบริการ", () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => location_banc()),
-                          );
-                        }),
-                        _menuItem(
-                            Image.asset(
-                              "assets/images/collectionduck/Artboard43.png",
-                              width: 60,
-                              height: 60,
-                            ),
-                            "แนะนำเพื่อน", () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ShareFriendScreen()),
-                          );
-                        }),
-                        _menuItem(
-                            Image.asset(
-                              "assets/images/collectionduck/Artboard37copy3.png",
-                              width: 60,
-                              height: 60,
-                            ),
-                            "โปรโมชั่น", () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => select_Promotion()),
-                          );
-                        }),
-                        _menuItem(
-                            Image.asset(
-                              "assets/images/collectionduck/Artboard17.png",
-                              width: 60,
-                              height: 60,
-                            ),
-                            "สะสมแต้ม", () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => point()),
-                          );
-                        }),
-                        _menuItem(
-                            Image.asset(
-                              "assets/images/collectionduck/Artboard24.png",
-                              width: 60,
-                              height: 60,
-                            ),
-                            "ประวัติใช้งาน", () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => History()),
-                          );
-                        }),
-                        _menuItem(
-                            Image.asset(
-                              "assets/images/collectionduck/Artboard37.png",
-                              width: 60,
-                              height: 60,
-                            ),
-                            "คู่มือใช้งาน", () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => manual()),
-                          );
-                        }),
-                        _menuItem(
-                            Image.asset(
-                              "assets/images/collectionduck/Artboard37copy5.png",
-                              width: 60,
-                              height: 60,
-                            ),
-                            "แจ้งปัญหา", () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Help()),
-                          );
-                        }),
-                      ],
-                    ),
-                  ],
+                          }),
+                          _menuItem(
+                              Image.asset(
+                                "assets/images/collectionduck/Artboard43.png",
+                                width: 60,
+                                height: 60,
+                              ),
+                              "แนะนำเพื่อน", () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ShareFriendScreen()),
+                            );
+                          }),
+                          _menuItem(
+                              Image.asset(
+                                "assets/images/collectionduck/Artboard37copy3.png",
+                                width: 60,
+                                height: 60,
+                              ),
+                              "โปรโมชั่น", () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => select_Promotion()),
+                            );
+                          }),
+                          _menuItem(
+                              Image.asset(
+                                "assets/images/collectionduck/Artboard17.png",
+                                width: 60,
+                                height: 60,
+                              ),
+                              "สะสมแต้ม", () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => point()),
+                            );
+                          }),
+                          _menuItem(
+                              Image.asset(
+                                "assets/images/collectionduck/Artboard24.png",
+                                width: 60,
+                                height: 60,
+                              ),
+                              "ประวัติใช้งาน", () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => History()),
+                            );
+                          }),
+                          _menuItem(
+                              Image.asset(
+                                "assets/images/collectionduck/Artboard37.png",
+                                width: 60,
+                                height: 60,
+                              ),
+                              "คู่มือใช้งาน", () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => manual()),
+                            );
+                          }),
+                          _menuItem(
+                              Image.asset(
+                                "assets/images/collectionduck/Artboard37copy5.png",
+                                width: 60,
+                                height: 60,
+                              ),
+                              "แจ้งปัญหา", () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Help()),
+                            );
+                          }),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
