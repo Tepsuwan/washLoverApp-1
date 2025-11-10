@@ -11,9 +11,9 @@ class Header extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
+        preferredSize: Size.fromHeight(80),
         child: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.pink,
           elevation: 0,
           flexibleSpace: SafeArea(
             child: Padding(

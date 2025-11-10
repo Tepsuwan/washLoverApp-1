@@ -4,7 +4,6 @@ import 'package:my_flutter_mapwash/Help/help.dart';
 import 'package:my_flutter_mapwash/Home/account.dart';
 import 'package:my_flutter_mapwash/Home/affiat.dart';
 import 'package:my_flutter_mapwash/Home/history.dart';
-import 'package:my_flutter_mapwash/Home/promotion.dart';
 import 'package:my_flutter_mapwash/Home/show_promotion.dart';
 import 'package:my_flutter_mapwash/Manual/manual.dart';
 import 'package:my_flutter_mapwash/Profile/profile.dart';
@@ -159,33 +158,38 @@ class _homeState extends State<home> {
                             );
                           },
                         ),
-                        _menuItem( Image.asset(
-                            "assets/images/collectionduck/Artboard1copy4.png",
-                            width: 60,
-                            height: 60,
-                          ),"จุดบริการ", () {
+                        _menuItem(
+                            Image.asset(
+                              "assets/images/collectionduck/Artboard1copy4.png",
+                              width: 60,
+                              height: 60,
+                            ),
+                            "จุดบริการ", () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => location_banc()),
                           );
                         }),
-                        _menuItem( Image.asset(
-                            "assets/images/collectionduck/Artboard43.png",
-                            width: 60,
-                            height: 60,
-                          ), "แนะนำเพื่อน", () {
+                        _menuItem(
+                            Image.asset(
+                              "assets/images/collectionduck/Artboard43.png",
+                              width: 60,
+                              height: 60,
+                            ),
+                            "แนะนำเพื่อน", () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => ShareFriendScreen()),
                           );
                         }),
-                        _menuItem( Image.asset(
-                            "assets/images/collectionduck/Artboard37copy3.png",
-                            width: 60,
-                            height: 60,
-                          ),
+                        _menuItem(
+                            Image.asset(
+                              "assets/images/collectionduck/Artboard37copy3.png",
+                              width: 60,
+                              height: 60,
+                            ),
                             "โปรโมชั่น", () {
                           Navigator.push(
                             context,
@@ -193,42 +197,49 @@ class _homeState extends State<home> {
                                 builder: (context) => select_Promotion()),
                           );
                         }),
-                        _menuItem( Image.asset(
-                            "assets/images/collectionduck/Artboard17.png",
-                            width: 60,
-                            height: 60,
-                          ), "สะสมแต้ม", () {
+                        _menuItem(
+                            Image.asset(
+                              "assets/images/collectionduck/Artboard17.png",
+                              width: 60,
+                              height: 60,
+                            ),
+                            "สะสมแต้ม", () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => point()),
                           );
                         }),
-                        _menuItem( Image.asset(
-                            "assets/images/collectionduck/Artboard24.png",
-                            width: 60,
-                            height: 60,
-                          ), "ประวัติใช้งาน", () {
+                        _menuItem(
+                            Image.asset(
+                              "assets/images/collectionduck/Artboard24.png",
+                              width: 60,
+                              height: 60,
+                            ),
+                            "ประวัติใช้งาน", () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => History()),
                           );
                         }),
-                        _menuItem( Image.asset(
-                            "assets/images/collectionduck/Artboard37.png",
-                            width: 60,
-                            height: 60,
-                          ), "คู่มือใช้งาน",
-                            () {
+                        _menuItem(
+                            Image.asset(
+                              "assets/images/collectionduck/Artboard37.png",
+                              width: 60,
+                              height: 60,
+                            ),
+                            "คู่มือใช้งาน", () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => manual()),
                           );
                         }),
-                        _menuItem( Image.asset(
-                            "assets/images/collectionduck/Artboard37copy5.png",
-                            width: 60,
-                            height: 60,
-                          ), "แจ้งปัญหา", () {
+                        _menuItem(
+                            Image.asset(
+                              "assets/images/collectionduck/Artboard37copy5.png",
+                              width: 60,
+                              height: 60,
+                            ),
+                            "แจ้งปัญหา", () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => Help()),
@@ -240,190 +251,6 @@ class _homeState extends State<home> {
                 ),
               ),
             ),
-            // SizedBox(height: 40),
-            Container(
-              margin: EdgeInsets.all(0),
-              padding: EdgeInsets.all(0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                children: [
-                  Image.asset('assets/images/2.png', fit: BoxFit.fitWidth),
-                  Image.asset('assets/images/33.png', fit: BoxFit.fitWidth),
-                  Image.asset('assets/images/44.png', fit: BoxFit.fitWidth),
-                ],
-              ),
-            ),
-
-            Container(
-              margin: EdgeInsets.all(0),
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color.fromARGB(39, 158, 158, 158),
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Image.asset(
-                              'assets/images/donot.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color.fromARGB(39, 158, 158, 158),
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Image.asset(
-                              'assets/images/notop.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                ],
-              ),
-            ),
-            // FAQ Section
-            Padding(
-              padding: EdgeInsets.all(0),
-              child: Column(
-                children: [
-                  Text(
-                    "คำถามที่พบบ่อย",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Container(
-                    // margin: EdgeInsets.all(0),
-                    // padding: EdgeInsets.all(0),
-                    height: 300,
-                    child: ListView(
-                      children: [
-                        buildExpansionTile(
-                          "ฉันต้องรอพนักงานมารับและส่งผ้าด้วยตนเองหรือไม่",
-                          "คุณสามารถวางตะกร้าผ้าของคุณไว้ตามจุดต่างๆที่พนักงานสามารถเข้าถึงได้ง่าย เช่น บริเวณพื้นที่ด้านล่างที่ได้รับอนุญาติจากหอพัก หรือบริเวณหน้าบ้านของคุณ โดยพนักงานจะไม่มีบริการเข้าไปภายในห้องหรือในตัวบ้านของลูกค้า สามารถระบุรายละเอียดต่างๆไว้ในแบบฟอร์มสั่งจอง",
-                          // isExpanded: true, // ทำให้ Tile แรกเปิดอยู่
-                        ),
-                        buildExpansionTile(
-                          "ช่องทางการชำระเงิน",
-                          "คุณสามารถชำระเงินผ่านบัตรเครดิต, โอนเงิน หรือช่องทางอื่นที่รองรับ",
-                        ),
-                        buildExpansionTile(
-                          "ฉันต้องจ่ายค่าบริการซัก-อบเมื่อไหร่",
-                          "ค่าบริการจะถูกคิดเมื่อการซักเสร็จสิ้น และสามารถชำระผ่านแอป",
-                        ),
-                        buildExpansionTile(
-                          "พนักงานจะรับ-ส่งผ้ากี่โมง",
-                          "พนักงานจะเข้ารับและส่งผ้าตามเวลาที่คุณเลือกในแอป",
-                        ),
-                        buildExpansionTile(
-                          "เปิดเวลากี่โมงถึงกี่โมง",
-                          "เปิดบริการทุกวัน 08:00 - 20:00 น.",
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(16),
-              margin: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    "ติดต่อเรา!",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "สอบถามเพิ่มเติมได้ที่นี่ ทีมงานของเรายินดีช่วยคุณ",
-                    style: TextStyle(color: Colors.white70),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 10),
-                  buildContactItem(Icons.location_on,
-                      "888/1 หมู่ที่ 3 ตำบลขอนยาง\nอ.กันทรวิชัย จ.มหาสารคาม 44150"),
-                  buildContactItem(Icons.phone, "080-339-6668"),
-                  buildContactItem(Icons.email, "washlover247@gmail.com"),
-                  buildContactItem(Icons.language, "www.washlover.com"),
-                ],
-              ),
-            ),
-            SizedBox(height: 0),
-            Container(
-              margin: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                children: [
-                  buildContactButton("LINE", Colors.green, Icons.chat, () {
-                    print("เปิด LINE");
-                  }),
-                  buildContactButton(
-                      "FACEBOOK MESSENGER", Colors.blue, Icons.facebook, () {
-                    print("เปิด Facebook Messenger");
-                  }),
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.all(0),
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Image.asset(
-                'assets/images/facebook.png',
-                fit: BoxFit.cover,
-              ),
-            )
           ],
         ),
       ),
@@ -587,4 +414,3 @@ class _homeState extends State<home> {
     );
   }
 }
-

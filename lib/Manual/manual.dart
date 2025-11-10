@@ -7,8 +7,6 @@ class manual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color mainBlue = Color(0xFF1976D2);
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: headerOrder(
@@ -19,41 +17,159 @@ class manual extends StatelessWidget {
           ); // ส่งคูปองที่เลือกกลับไป
         },
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          _sectionTitle("🧼 วิธีใช้งานแอป WASHLOVER"),
-          _stepText("1. สมัครสมาชิก หรือเข้าสู่ระบบด้วยเบอร์โทรศัพท์"),
-          _stepText("2. เลือกบริการที่คุณต้องการ เช่น ซักผ้า อบผ้า"),
-          _stepText("3. เลือกสถานที่และเวลารับ-ส่งผ้า"),
-          _stepText("4. ยืนยันรายการและชำระเงิน"),
-          _stepText("5. รอรับบริการถึงหน้าบ้าน"),
-          const SizedBox(height: 32),
-          _sectionTitle("📦 การติดตามสถานะ"),
-          _stepText("• สามารถตรวจสอบสถานะผ้าของคุณได้ในหน้า 'สถานะ'"),
-          _stepText("• ระบบจะแจ้งเตือนเมื่อสถานะเปลี่ยนแปลง"),
-          const SizedBox(height: 32),
-          _sectionTitle("💳 การชำระเงิน"),
-          _stepText(
-              "• รองรับการชำระผ่านบัตรเครดิต/เดบิต และโอนผ่านธนาคาร หรือเติมเป็นเครดิต"),
-          _stepText("• หลังชำระเงินจะได้รับใบเสร็จอัตโนมัติ"),
-          const SizedBox(height: 32),
-          _sectionTitle("📞 ติดต่อทีมงาน"),
-          _stepText(
-              "• หากพบปัญหา สามารถติดต่อฝ่ายบริการลูกค้าได้ที่เมนู 'ช่วยเหลือ'"),
-          _stepText("• เวลาทำการ: ทุกวัน 09:00 - 18:00"),
-          const SizedBox(height: 32),
-          Center(
-            child: Text(
-              "ขอบคุณที่ใช้บริการ WASHLOVER!",
-              style: GoogleFonts.prompt(
-                fontSize: 16,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 12),
+            Container(
+              margin: EdgeInsets.all(0),
+              padding: EdgeInsets.all(0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  Image.asset('assets/images/2.png', fit: BoxFit.fitWidth),
+                  Image.asset('assets/images/33.png', fit: BoxFit.fitWidth),
+                  Image.asset('assets/images/44.png', fit: BoxFit.fitWidth),
+                ],
               ),
             ),
-          ),
-        ],
+
+            Container(
+              margin: EdgeInsets.all(0),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color.fromARGB(39, 158, 158, 158),
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Image.asset(
+                              'assets/images/donot.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color.fromARGB(39, 158, 158, 158),
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Image.asset(
+                              'assets/images/notop.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            ),
+            // FAQ Section
+            Padding(
+              padding: EdgeInsets.all(0),
+              child: Column(
+                children: [
+                  Text(
+                    "คำถามที่พบบ่อย",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                ],
+              ),
+            ),
+
+            Container(
+              padding: EdgeInsets.all(16),
+              margin: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    "ติดต่อเรา!",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "สอบถามเพิ่มเติมได้ที่นี่ ทีมงานของเรายินดีช่วยคุณ",
+                    style: TextStyle(color: Colors.white70),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 10),
+                  buildContactItem(Icons.location_on,
+                      "888/1 หมู่ที่ 3 ตำบลขอนยาง\nอ.กันทรวิชัย จ.มหาสารคาม 44150"),
+                  buildContactItem(Icons.phone, "080-339-6668"),
+                  buildContactItem(Icons.email, "washlover247@gmail.com"),
+                  buildContactItem(Icons.language, "www.washlover.com"),
+                ],
+              ),
+            ),
+            SizedBox(height: 0),
+            Container(
+              margin: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  buildContactButton("LINE", Colors.green, Icons.chat, () {
+                    print("เปิด LINE");
+                  }),
+                  buildContactButton(
+                      "FACEBOOK MESSENGER", Colors.blue, Icons.facebook, () {
+                    print("เปิด Facebook Messenger");
+                  }),
+                ],
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.all(0),
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Image.asset(
+                'assets/images/facebook.png',
+                fit: BoxFit.cover,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -83,6 +199,163 @@ class manual extends StatelessWidget {
           height: 1.4,
         ),
       ),
+    );
+  }
+
+  Widget _walletItem2(Widget img, String title, String value) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 22,
+          backgroundColor: Colors.white,
+          child: img,
+        ),
+        SizedBox(height: 6),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+        Text(
+          value,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, color: Colors.blue),
+        ),
+      ],
+    );
+  }
+
+  Widget _walletItem(Widget img, String title, String value) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 22,
+          backgroundColor: Colors.white,
+          child: img,
+        ),
+        SizedBox(height: 6),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+        Text(
+          value,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, color: Colors.blue),
+        ),
+      ],
+    );
+  }
+
+  Widget _duckItem(Widget img, String title, String value) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircleAvatar(
+          radius: 22,
+          backgroundColor: Colors.white,
+          child: img,
+        ),
+        SizedBox(height: 6),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+        Text(
+          value,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.blue,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _menuItem(Widget img, String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+            child: img,
+          ),
+          SizedBox(height: 6),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildContactButton(
+      String text, Color color, IconData icon, VoidCallback onPressed) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(vertical: 5),
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, color: Colors.white),
+        label: Text(text, style: TextStyle(color: Colors.white)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        ),
+      ),
+    );
+  }
+
+  Widget buildContactItem(IconData icon, String text) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.amber, size: 24),
+          SizedBox(width: 10),
+          Expanded(child: Text(text, style: TextStyle(color: Colors.white))),
+        ],
+      ),
+    );
+  }
+
+  Widget buildExpansionTile(String title, String content,
+      {bool isExpanded = false}) {
+    return ExpansionTile(
+      title: Text(
+        title,
+        style: TextStyle(color: Colors.black),
+      ),
+      initiallyExpanded: isExpanded, // ทำให้ Tile แรกเปิดอยู่
+      children: [
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: Text(content, style: TextStyle(color: Colors.black54)),
+        ),
+      ],
+    );
+  }
+
+  Widget buildInfoItem(IconData icon, String title, String amount) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.blue[200]),
+        Text(title, style: TextStyle(fontSize: 12, color: Colors.black54)),
+        Text(amount,
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.amber)),
+      ],
     );
   }
 }
