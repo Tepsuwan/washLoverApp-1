@@ -13,7 +13,7 @@ class Header extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80),
         child: AppBar(
-          backgroundColor: Colors.pink,
+          backgroundColor: Colors.white,
           elevation: 0,
           flexibleSpace: SafeArea(
             child: Padding(
@@ -135,4 +135,3 @@ class Header extends StatelessWidget {
     );
   }
 }
-
