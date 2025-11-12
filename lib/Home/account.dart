@@ -23,6 +23,7 @@ class _pointState extends State<point> {
   String userPhone = "Loading...";
   String credit = "Loading...";
   String point = "Loading...";
+  String last_actives = "Loading...";
   String userImageUrl = "https://via.placeholder.com/150";
   String password = "Loading...";
   String address = "ที่อยู่สำหรับการจัดส่ง";
@@ -41,7 +42,8 @@ class _pointState extends State<point> {
         username = userData['name'] ?? 'ไม่ทราบชื่อ';
         userPhone = userData['phone'] ?? 'ไม่ทราบเบอร์';
         credit = userData['credit'].toString();
-        point = userData['point'].toString();
+        point = userData['points'].toString();
+        last_actives = userData['last_active'].toString();
         userImageUrl = userData['image_url'] ?? userImageUrl;
       });
     }
@@ -49,8 +51,6 @@ class _pointState extends State<point> {
 
   final List<Map<String, dynamic>> expiringPoints = [
     {"points": 120, "expireDate": "31 ต.ค. 2025"},
-    {"points": 50, "expireDate": "15 พ.ย. 2025"},
-    {"points": 30, "expireDate": "1 ธ.ค. 2025"},
   ];
 
   @override
@@ -77,7 +77,6 @@ class _pointState extends State<point> {
               ),
             ),
           ),
-
           ...List.generate(20, (index) {
             final random = index * 37.3;
             final top = (random * 7) % screenSize.height;
@@ -89,7 +88,6 @@ class _pointState extends State<point> {
               child: _bubble(size),
             );
           }),
-
           Column(
             children: [
               const SizedBox(height: 10),
@@ -166,10 +164,9 @@ class _pointState extends State<point> {
                                 ),
                               ],
                             ),
-
                             const SizedBox(height: 6),
                             Text(
-                              "$point คะแนน • หมดอายุ 31 ต.ค. 2025",
+                              "ใช้งานล่าสุด • $last_actives",
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
