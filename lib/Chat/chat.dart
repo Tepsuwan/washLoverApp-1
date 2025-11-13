@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_flutter_mapwash/Chat/features/create_join_room/join_room_page.dart';
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key});
@@ -44,7 +45,10 @@ class ChatScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.call, color: Colors.white),
             onPressed: () {
-              // action call
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => JoinRoomPage()),
+              );
             },
           ),
         ],
@@ -121,7 +125,7 @@ Widget _buildMessage({required bool isMe, required String message}) {
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isMe ?  Colors.green : Colors.white,
+        color: isMe ? Colors.green : Colors.white,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Text(

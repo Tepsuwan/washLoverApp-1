@@ -28,9 +28,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _init();
+  }
 
-    api_config.loadEndpoint();
-    _checkLogin();
+  Future<void> _init() async {
+    await api_config.loadEndpoint();
+    _checkLogin(); // ฟังก์ชันเช็ค login ของคุณ
   }
 
   Future<void> _checkLogin() async {

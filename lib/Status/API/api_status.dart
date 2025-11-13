@@ -19,7 +19,6 @@ class api_status {
       );
 
       if (response.statusCode == 200) {
-        print("Response: ${response.body}");
         final data = json.decode(response.body);
 
         List<dynamic> listData = [];
