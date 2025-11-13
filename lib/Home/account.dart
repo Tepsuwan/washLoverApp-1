@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:my_flutter_mapwash/Home/API/api_account.dart';
 import 'package:my_flutter_mapwash/Header/headerOrder.dart';
+import 'package:intl/intl.dart';
 
 class point extends StatefulWidget {
   const point({super.key});
@@ -35,6 +36,37 @@ class _pointState extends State<point> {
     loadUserData();
   }
 
+  String formatThaiDateTime(String dateString) {
+    try {
+      DateTime date =
+          DateTime.parse(dateString).toLocal(); // แปลงเป็นเวลาเครื่อง
+      const months = [
+        'ม.ค.',
+        'ก.พ.',
+        'มี.ค.',
+        'เม.ย.',
+        'พ.ค.',
+        'มิ.ย.',
+        'ก.ค.',
+        'ส.ค.',
+        'ก.ย.',
+        'ต.ค.',
+        'พ.ย.',
+        'ธ.ค.'
+      ];
+
+      String day = date.day.toString();
+      String month = months[date.month - 1];
+      String year = (date.year + 543).toString(); // แปลงเป็น พ.ศ.
+      String hour = date.hour.toString().padLeft(2, '0');
+      String minute = date.minute.toString().padLeft(2, '0');
+
+      return '$day $month $year เวลา $hour:$minute น.';
+    } catch (e) {
+      return dateString; // ถ้าแปลงไม่ได้ ให้คืนค่าดิบ
+    }
+  }
+
   Future<void> loadUserData() async {
     var userData = await API_account.fetchapiaccount();
     if (userData != null) {
@@ -43,7 +75,7 @@ class _pointState extends State<point> {
         userPhone = userData['phone'] ?? 'ไม่ทราบเบอร์';
         credit = userData['credit'].toString();
         point = userData['points'].toString();
-        last_actives = userData['last_active'].toString();
+        last_actives = formatThaiDateTime(userData['last_active'].toString());
         userImageUrl = userData['image_url'] ?? userImageUrl;
       });
     }
@@ -51,6 +83,8 @@ class _pointState extends State<point> {
 
   final List<Map<String, dynamic>> expiringPoints = [
     {"points": 120, "expireDate": "31 ต.ค. 2025"},
+    {"points": 240, "expireDate": "26 พ.ย. 2025"},
+    {"points": 360, "expireDate": "5 ธ.ค. 2025"},
   ];
 
   @override
