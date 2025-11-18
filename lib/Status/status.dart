@@ -8,6 +8,7 @@ import 'package:my_flutter_mapwash/Status/realtime_status.dart';
 
 class Status extends StatefulWidget {
   const Status({super.key});
+  
 
   @override
   _StatusState createState() => _StatusState();
@@ -167,9 +168,9 @@ class _StatusState extends State<Status> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ChatScreen(
-                          // chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
-                          // deviceId: device_id,
-                          // title: title,     // อาจใช้เป็นชื่อหัวแชต
+                          chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
+                          deviceId: device_id,
+                          title: title,     // อาจใช้เป็นชื่อหัวแชต
                           ),
                     ),
                   );

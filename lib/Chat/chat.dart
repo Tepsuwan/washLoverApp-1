@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:my_flutter_mapwash/Chat/features/create_join_room/join_room_page.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+  final String chatId;
+  final String deviceId;
+  final String title;
+
+  const ChatScreen({
+    Key? key,
+    required this.chatId,
+    required this.deviceId,
+    required this.title,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFEFF3FB),
-
-      // ✅ ใช้ AppBar จริง
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 68, 166, 247),
         elevation: 0,
@@ -25,19 +32,23 @@ class ChatScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
-        title: const Column(
+        title: Column(
           children: [
             Text(
-              'Molly Clark',
-              style: TextStyle(
+              title, // ใช้ title จาก constructor
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
+            const Text(
               'Online',
               style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+            Text(
+              deviceId, // ใช้ deviceId ตรง ๆ
+              style: const TextStyle(color: Colors.white70, fontSize: 10),
             ),
           ],
         ),
@@ -45,20 +56,25 @@ class ChatScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.call, color: Colors.white),
             onPressed: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (_) => JoinRoomPage()),
+              // );
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => JoinRoomPage()),
+                MaterialPageRoute(
+                  builder: (context) => JoinRoomPage(
+                    deviceId: deviceId,
+                  ),
+                ),
               );
             },
           ),
         ],
       ),
-
-      // ✅ ส่วนเนื้อหา
       body: SafeArea(
         child: Column(
           children: [
-            // Chat messages
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(20),
@@ -78,8 +94,6 @@ class ChatScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Message Input Box
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
@@ -117,7 +131,7 @@ class ChatScreen extends StatelessWidget {
   }
 }
 
-// ===== ตัวอย่างฟังก์ชันช่วยแสดงข้อความ =====
+// ===== ตัวช่วยแสดงข้อความ =====
 Widget _buildMessage({required bool isMe, required String message}) {
   return Align(
     alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,

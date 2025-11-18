@@ -20,7 +20,7 @@ class VideoCallScreen extends StatefulWidget {
 
 class _VideoCallScreenState extends State<VideoCallScreen> {
   late AgoraController agoraController =
-      Get.put<AgoraController>(AgoraController(channel: widget.channelName));
+      Get.put<AgoraController>(AgoraController(channel: widget.channelName, channelName: ''));
 
   @override
   void initState() {
@@ -48,33 +48,33 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               bottom: 16.0,
               top: 0.0,
             ),
-            child: Obx(
-              () {
-                final totalRemoteusers = agoraController.remoteUsers.length;
-                switch (totalRemoteusers) {
-                  case 0:
-                    // Only Current User
-                    return _NoRemoteUserView(
-                      agoraController: agoraController,
-                    );
+            // child: Obx(
+            //   () {
+            //     final totalRemoteusers = agoraController.remoteUsers.length;
+            //     switch (totalRemoteusers) {
+            //       case 0:
+            //         // Only Current User
+            //         return _NoRemoteUserView(
+            //           agoraController: agoraController,
+            //         );
 
-                  case 1:
-                    // 1 Remote + 1 Current User
-                    return _TwoUserView(
-                      agoraController: agoraController,
-                    );
+            //       case 1:
+            //         // 1 Remote + 1 Current User
+            //         return _TwoUserView(
+            //           agoraController: agoraController,
+            //         );
 
-                  case 2:
-                    // 2 Remote + 1 Current User
-                    return _ThreeUserView(agoraController: agoraController);
+            //       case 2:
+            //         // 2 Remote + 1 Current User
+            //         return _ThreeUserView(agoraController: agoraController);
 
-                  case 3:
-                    // 3 Remote + 1 Current User
-                    return _FourUserView(agoraController: agoraController);
-                }
-                return Container();
-              },
-            ),
+            //       case 3:
+            //         // 3 Remote + 1 Current User
+            //         return _FourUserView(agoraController: agoraController);
+            //     }
+            //     return Container();
+            //   },
+            // ),
           ),
           // BottomControlSection(agoraController: agoraController),
         ],

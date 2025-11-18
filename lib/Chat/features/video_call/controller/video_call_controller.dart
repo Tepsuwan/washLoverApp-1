@@ -39,7 +39,7 @@ class AgoraController {
   final uid = Random().nextInt(19000);
 
   AgoraController({
-    required final String channel,
+    required final String channel, required String channelName,
   }) {
     channelId = channel;
     _generateAgoraAuthToken();
@@ -214,4 +214,12 @@ class AgoraController {
     isBackCamera.value = !isBackCamera.value;
     engine.switchCamera();
   }
+
+  void toggleSpeaker() {}
+
+  void toggleCamera() {}
+
+  void toggleMic() {}
+
+  void endCall() {}
 }

@@ -4,12 +4,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_flutter_mapwash/Chat/features/create_join_room/create_room_page.dart';
+import 'package:my_flutter_mapwash/Chat/features/video_call/controller/video_call_controller.dart';
 import 'package:my_flutter_mapwash/Chat/features/video_call/view/video_call_page.dart';
+import 'package:my_flutter_mapwash/Chat/features/video_call/view/voice_call_page.dart';
 import 'package:my_flutter_mapwash/Chat/utils/utils.dart';
 
 // import '../../design_system/text_styles.dart';
 
 class JoinRoomPage extends StatelessWidget {
+  final String deviceId;
+
+  JoinRoomPage({
+    super.key,
+    required this.deviceId,
+  });
+
   final TextEditingController roomTxtController = TextEditingController();
 
   @override
@@ -34,7 +43,7 @@ class JoinRoomPage extends StatelessWidget {
               child: TextFormField(
                 controller: roomTxtController,
                 decoration: InputDecoration(
-                  hintText: "Room Id :",
+                  hintText: "Room Id : ${deviceId}",
                   focusedBorder: OutlineInputBorder(
                     borderSide:
                         BorderSide(color: const Color(0xFF1A1E78), width: 2),
@@ -79,15 +88,33 @@ class JoinRoomPage extends StatelessWidget {
                       );
                     }
                   } else {
-                    Get.snackbar(
-                      "Failed",
-                      "Enter Room-Id to Join.",
-                      backgroundColor: Colors.white,
-                      colorText: Color(0xFF1A1E78),
-                      snackPosition: SnackPosition.BOTTOM,
-                      duration: Duration(milliseconds: 1000),
-                      animationDuration: Duration(milliseconds: 750),
+                    // หน้า Navigator
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => AgoraPage(
+                    //       channel: roomTxtController.text,
+                    //     ),
+                    //   ),
+                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VoiceCallPage(
+                          channelName: roomTxtController.text.trim(),
+                        ),
+                      ),
                     );
+
+                    // Get.snackbar(
+                    //   "Failed",
+                    //   "Enter Room-Id to Join.",
+                    //   backgroundColor: Colors.white,
+                    //   colorText: Color(0xFF1A1E78),
+                    //   snackPosition: SnackPosition.BOTTOM,
+                    //   duration: Duration(milliseconds: 1000),
+                    //   animationDuration: Duration(milliseconds: 750),
+                    // );
                   }
                 },
                 label: Icon(

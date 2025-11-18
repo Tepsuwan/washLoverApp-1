@@ -134,7 +134,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => JoinRoomPage(),
+                      builder: (context) => JoinRoomPage(deviceId: '',),
                     ),
                   );
                 },

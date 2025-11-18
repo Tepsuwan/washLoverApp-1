@@ -17,9 +17,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Obx(
         () {
           final duration = agoraController.meetingDurationTxt.value;
-          return Text(
-            'Meeting Duration : ${duration}',
-            // style: AppTextStyles.regular.copyWith(color: Colors.black),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'โทรออก...',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${duration}',
+                style: TextStyle(fontSize: 14 , color: Colors.red),
+              ),
+            ],
           );
         },
       ),
@@ -27,5 +36,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(kMinInteractiveDimension);
 }

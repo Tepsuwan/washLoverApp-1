@@ -24,7 +24,7 @@ class HomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => JoinRoomPage()),
+                MaterialPageRoute(builder: (_) => JoinRoomPage(deviceId: '',)),
               ),
               child: Text("เข้าร่วมห้องแชท"),
             ),
