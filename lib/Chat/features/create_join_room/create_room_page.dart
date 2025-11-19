@@ -28,10 +28,6 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
       appBar: AppBar(
         title: Text(
           "Create Room55",
-          // style: AppTextStyles.medium.copyWith(
-          //   fontWeight: FontWeight.w700,
-          //   color: const Color(0xFF1A1E78),
-          // ),
         ),
       ),
       body: SafeArea(
@@ -106,7 +102,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                     icon:
                         const Icon(Icons.login, color: Colors.white, size: 18),
                     label: Text(
-                      "Join Room",
+                      "Call",
                       selectionColor: Colors.white,
                     ),
                     style: ElevatedButton.styleFrom(

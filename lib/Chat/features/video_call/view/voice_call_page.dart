@@ -1,7 +1,7 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:my_flutter_mapwash/Chat/features/video_call/controller/agora_controller22.dart';
+import 'package:my_flutter_mapwash/Chat/features/video_call/controller/voice_call_controller.dart';
 
 class VoiceCallPage extends StatefulWidget {
   final String channelName;
@@ -16,14 +16,14 @@ class VoiceCallPage extends StatefulWidget {
 }
 
 class _VoiceCallPageState extends State<VoiceCallPage> {
-  late AgoraController22 agoraController;
+  late VoiceCallController agoraController;
 
   @override
   void initState() {
     super.initState();
     // สร้าง controller พร้อม channelName
     agoraController = Get.put(
-      AgoraController22(channel: widget.channelName, token: '', uid: 0),
+      VoiceCallController(channel: widget.channelName),
     );
     _startVoiceCall();
   }
@@ -31,12 +31,12 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
   Future<void> _startVoiceCall() async {
     await agoraController.engine.enableAudio();
     await agoraController.engine.muteLocalAudioStream(false);
-    await agoraController.engine.joinChannel(
-      token: agoraController.token,
-      channelId: widget.channelName,
-      uid: 0,
-      options: const ChannelMediaOptions(),
-    );
+    // await agoraController.engine.joinChannel(
+    //   token: agoraController.token,
+    //   channelId: widget.channelName,
+    //   uid: 0,
+    //   options: const ChannelMediaOptions(),
+    // );
 
     // await agoraController.engine.joinChannel(
     //   agoraController.token,
@@ -50,8 +50,10 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
   Future<void> _endCall() async {
     await agoraController.engine.leaveChannel();
     await agoraController.engine.release();
-    Get.delete<AgoraController22>();
-    Navigator.pop(context);
+    Get.delete<VoiceCallController>();
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -86,7 +88,7 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
                   size: 36,
                 ),
                 onPressed: () {
-                  agoraController.toggleMute();
+                  // agoraController.toggleMute();
                 },
               ),
               const SizedBox(height: 10),

@@ -26,11 +26,7 @@ class JoinRoomPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Join Room",
-          // style: AppTextStyles.medium.copyWith(
-          //   color: const Color(0xFF1A1E78),
-          //   fontWeight: FontWeight.w700,
-          // ),
+          "Call",
         ),
       ),
       body: SingleChildScrollView(
@@ -53,10 +49,6 @@ class JoinRoomPage extends StatelessWidget {
                         BorderSide(color: const Color(0xFF1A1E78), width: 2),
                   ),
                 ),
-                // style: AppTextStyles.regular.copyWith(
-                //   color: const Color(0xFF1A1E78),
-                //   fontWeight: FontWeight.w600,
-                // ),
               ),
             ),
             const SizedBox(height: 20),
@@ -88,37 +80,18 @@ class JoinRoomPage extends StatelessWidget {
                       );
                     }
                   } else {
-                    // หน้า Navigator
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => AgoraPage(
-                    //       channel: roomTxtController.text,
-                    //     ),
-                    //   ),
-                    // );
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => VoiceCallPage(
-                          channelName: roomTxtController.text.trim(),
+                          channelName: deviceId,
                         ),
                       ),
                     );
-
-                    // Get.snackbar(
-                    //   "Failed",
-                    //   "Enter Room-Id to Join.",
-                    //   backgroundColor: Colors.white,
-                    //   colorText: Color(0xFF1A1E78),
-                    //   snackPosition: SnackPosition.BOTTOM,
-                    //   duration: Duration(milliseconds: 1000),
-                    //   animationDuration: Duration(milliseconds: 750),
-                    // );
                   }
                 },
                 label: Icon(
-                  Icons.login_outlined,
+                  Icons.call,
                   color: Colors.white,
                   size: 18,
                 ),
@@ -131,7 +104,67 @@ class JoinRoomPage extends StatelessWidget {
                 icon: Padding(
                   padding: const EdgeInsets.only(left: 8),
                   child: Text(
-                    "Join Room",
+                    "Call Driver",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  if (roomTxtController.text.isNotEmpty) {
+                    bool isPermissionGranted =
+                        await handlePermissionsForCall(context);
+                    if (isPermissionGranted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VideoCallScreen(
+                            channelName: roomTxtController.text,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Get.snackbar(
+                        "Failed",
+                        "Microphone Permission Required for Video Call.",
+                        backgroundColor: Colors.white,
+                        colorText: Color(0xFF1A1E78),
+                        snackPosition: SnackPosition.BOTTOM,
+                        duration: Duration(milliseconds: 1000),
+                        animationDuration: Duration(milliseconds: 750),
+                      );
+                    }
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VoiceCallPage(
+                          channelName: "test",
+                        ),
+                      ),
+                    );
+                  }
+                },
+                label: Icon(
+                  Icons.call,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  backgroundColor: const Color.fromARGB(255, 26, 120, 37),
+                ),
+                icon: Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Text(
+                    "ทดลองโทร",
                     style: TextStyle(
                       color: Colors.white,
                     ),
