@@ -9,16 +9,17 @@ import 'package:flutter/material.dart';
 
 import '../../../utils/utils.dart';
 
-class VoiceCallController {
+class VoiceCallController extends GetxController {
   late RtcEngine engine;
 
   // Timer
-  late Timer meetingTimer;
+  Timer? meetingTimer;
   int meetingDuration = 0;
   RxString meetingDurationTxt = "00:00".obs;
 
   // States
   final isMuted = false.obs;
+  final isSpeakerOn = false.obs;     // ⭐ FIXED (ของเดิม null)
   final isJoined = false.obs;
 
   // Remote users
@@ -65,7 +66,7 @@ class VoiceCallController {
 
     await engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
 
-    // ❗ Voice Call: enableAudio only
+    // Voice-only mode
     await engine.enableAudio();
 
     joinChannel();
@@ -97,10 +98,6 @@ class VoiceCallController {
   void addEventHandlers() {
     engine.registerEventHandler(
       RtcEngineEventHandler(
-        onConnectionStateChanged: (connection, state, reason) {
-          dev.log("Connection State Changed: $state, reason: $reason");
-        },
-
         onJoinChannelSuccess: (connection, elapsed) {
           dev.log("Local user joined: ${connection.localUid}");
           isJoined.value = true;
@@ -110,6 +107,7 @@ class VoiceCallController {
           dev.log("Local user left");
           isJoined.value = false;
           remoteUsers.clear();
+          stopMeetingTimer();
         },
 
         onUserJoined: (connection, remoteUid, elapsed) {
@@ -123,22 +121,6 @@ class VoiceCallController {
           dev.log("Remote user left: $remoteUid");
           remoteUsers.remove(remoteUid);
           remoteUidOne = null;
-        },
-
-        onTokenPrivilegeWillExpire: (connection, token) {
-          dev.log("Token will expire soon!");
-        },
-
-        onNetworkQuality: (connection, remoteUid, txQuality, rxQuality) {
-          networkQuality = getNetworkQuality(txQuality.index);
-          networkQualityBarColor = getNetworkQualityBarColor(txQuality.index);
-        },
-
-        onError: (err, msg) {
-          dev.log("==========================");
-          dev.log("Agora Error: ${err.name}");
-          dev.log("Message: $msg");
-          dev.log("==========================");
         },
       ),
     );
@@ -160,28 +142,41 @@ class VoiceCallController {
   // MEETING TIMER
   // ----------------------------------------------------------------------
   void startMeetingTimer() {
+    stopMeetingTimer();
+
     meetingTimer = Timer.periodic(
       const Duration(seconds: 1),
       (timer) {
         int min = meetingDuration ~/ 60;
         int sec = meetingDuration % 60;
 
-        final minStr = min < 10 ? "0$min" : "$min";
-        final secStr = sec < 10 ? "0$sec" : "$sec";
-
-        meetingDurationTxt.value = "$minStr:$secStr";
+        meetingDurationTxt.value =
+            "${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}";
 
         meetingDuration++;
       },
     );
   }
 
+  void stopMeetingTimer() {
+    meetingTimer?.cancel();
+    meetingTimer = null;
+  }
+
   // ----------------------------------------------------------------------
   // AUDIO CONTROLS
   // ----------------------------------------------------------------------
-  void onToggleMuteAudio() async {
+
+  /// Toggle mic mute/unmute
+  void toggleMute() async {
     isMuted.value = !isMuted.value;
     await engine.muteLocalAudioStream(isMuted.value);
+  }
+
+  /// Toggle speaker on/off
+  void toggleSpeaker() async {
+    isSpeakerOn.value = !isSpeakerOn.value;
+    await engine.setEnableSpeakerphone(isSpeakerOn.value);
   }
 
   // ----------------------------------------------------------------------
@@ -189,8 +184,12 @@ class VoiceCallController {
   // ----------------------------------------------------------------------
   void endCall() {
     engine.leaveChannel();
-    try {
-      meetingTimer.cancel();
-    } catch (_) {}
+    stopMeetingTimer();
+  }
+
+  @override
+  void onClose() {
+    stopMeetingTimer();
+    super.onClose();
   }
 }
