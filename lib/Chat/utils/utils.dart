@@ -169,10 +169,9 @@ void shareToApps(String roomId) async {
   );
 }
 
-///
 /// 📌 ใช้สำหรับ Video Call → ขอ Camera + Mic
 /// 📌 ใช้สำหรับ Voice Call → ขอ Mic อย่างเดียว
-///
+
 Future<bool> handlePermissionsForCall(
   BuildContext context, {
   bool isVideoCall = true,
@@ -180,14 +179,10 @@ Future<bool> handlePermissionsForCall(
   List<Permission> perms = [
     Permission.microphone,
   ];
-
   if (isVideoCall) {
     perms.add(Permission.camera);
   }
-
   Map<Permission, PermissionStatus> statuses = await perms.request();
-
-  // Check permanently denied
   for (var permission in perms) {
     if (statuses[permission]?.isPermanentlyDenied ?? false) {
       showCustomDialog(
@@ -214,6 +209,32 @@ Future<bool> handlePermissionsForCall(
 
   return true;
 }
+
+Future<bool> handlePermissionsCall(BuildContext context) async {
+  // ขอเฉพาะสิทธิ์ไมโครโฟน
+  PermissionStatus status = await Permission.microphone.request();
+  // กรณีผู้ใช้กด Don't ask again
+  if (status.isPermanentlyDenied) {
+    showCustomDialog(
+      context,
+      "Permission Required",
+      "Microphone permission is required for voice call.",
+      () {
+        Navigator.pop(context);
+        openAppSettings();
+      },
+    );
+    return false;
+  }
+
+  // กรณีถูกปฏิเสธธรรมดา
+  if (status.isDenied) {
+    return false;
+  }
+
+  return status.isGranted;
+}
+
 
 void showCustomDialog(
   BuildContext context,

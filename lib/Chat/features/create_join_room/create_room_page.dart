@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:my_flutter_mapwash/Chat/features/create_join_room/join_room_page.dart';
 import 'package:my_flutter_mapwash/Chat/features/video_call/view/video_call_page.dart';
 import 'package:my_flutter_mapwash/Chat/utils/utils.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // import '../../design_system/text_styles.dart';
 
@@ -77,7 +78,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                   ElevatedButton.icon(
                     onPressed: () async {
                       bool isPermissionGranted =
-                          await handlePermissionsForCall(context);
+                          await handlePermissionsCall(context);
                       if (isPermissionGranted) {
                         Navigator.push(
                           context,
@@ -88,15 +89,8 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                           ),
                         );
                       } else {
-                        Get.snackbar(
-                          "Failed",
-                          "Microphone Permission Required for Video Call.",
-                          backgroundColor: Colors.white,
-                          colorText: const Color(0xFF1A1E78),
-                          snackPosition: SnackPosition.BOTTOM,
-                          duration: const Duration(milliseconds: 1000),
-                          animationDuration: const Duration(milliseconds: 750),
-                        );
+                        Navigator.pop(context);
+                        openAppSettings();
                       }
                     },
                     icon:
@@ -130,7 +124,9 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => JoinRoomPage(deviceId: '',),
+                      builder: (context) => JoinRoomPage(
+                        deviceId: '',
+                      ),
                     ),
                   );
                 },

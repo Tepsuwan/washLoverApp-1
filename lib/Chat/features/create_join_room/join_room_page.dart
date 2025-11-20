@@ -8,6 +8,7 @@ import 'package:my_flutter_mapwash/Chat/features/video_call/controller/video_cal
 import 'package:my_flutter_mapwash/Chat/features/video_call/view/video_call_page.dart';
 import 'package:my_flutter_mapwash/Chat/features/video_call/view/voice_call_page.dart';
 import 'package:my_flutter_mapwash/Chat/utils/utils.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // import '../../design_system/text_styles.dart';
 
@@ -56,38 +57,20 @@ class JoinRoomPage extends StatelessWidget {
               alignment: Alignment.center,
               child: ElevatedButton.icon(
                 onPressed: () async {
-                  if (roomTxtController.text.isNotEmpty) {
-                    bool isPermissionGranted =
-                        await handlePermissionsForCall(context);
-                    if (isPermissionGranted) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VideoCallScreen(
-                            channelName: roomTxtController.text,
-                          ),
-                        ),
-                      );
-                    } else {
-                      Get.snackbar(
-                        "Failed",
-                        "Microphone Permission Required for Video Call.",
-                        backgroundColor: Colors.white,
-                        colorText: Color(0xFF1A1E78),
-                        snackPosition: SnackPosition.BOTTOM,
-                        duration: Duration(milliseconds: 1000),
-                        animationDuration: Duration(milliseconds: 750),
-                      );
-                    }
-                  } else {
+                  bool isPermissionGranted =
+                      await handlePermissionsForCall(context);
+                  if (isPermissionGranted) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => VoiceCallPage(
-                          channelName: deviceId,
+                        builder: (context) => VideoCallScreen(
+                          channelName: roomTxtController.text,
                         ),
                       ),
                     );
+                  } else {
+                    Navigator.pop(context);
+                    openAppSettings();
                   }
                 },
                 label: Icon(
@@ -116,38 +99,20 @@ class JoinRoomPage extends StatelessWidget {
               alignment: Alignment.center,
               child: ElevatedButton.icon(
                 onPressed: () async {
-                  if (roomTxtController.text.isNotEmpty) {
-                    bool isPermissionGranted =
-                        await handlePermissionsForCall(context);
-                    if (isPermissionGranted) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VideoCallScreen(
-                            channelName: roomTxtController.text,
-                          ),
-                        ),
-                      );
-                    } else {
-                      Get.snackbar(
-                        "Failed",
-                        "Microphone Permission Required for Video Call.",
-                        backgroundColor: Colors.white,
-                        colorText: Color(0xFF1A1E78),
-                        snackPosition: SnackPosition.BOTTOM,
-                        duration: Duration(milliseconds: 1000),
-                        animationDuration: Duration(milliseconds: 750),
-                      );
-                    }
-                  } else {
+                  bool isPermissionGranted =
+                      await handlePermissionsForCall(context);
+                  if (isPermissionGranted) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => VoiceCallPage(
-                          channelName: "test",
+                          channelName: 'test',
                         ),
                       ),
                     );
+                  } else {
+                    Navigator.pop(context);
+                    openAppSettings();
                   }
                 },
                 label: Icon(
