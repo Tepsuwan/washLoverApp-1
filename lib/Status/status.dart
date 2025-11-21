@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_flutter_mapwash/Chat/chat.dart';
 import 'package:my_flutter_mapwash/Chat/test.dart';
+import 'package:my_flutter_mapwash/Chat_socket/chat_page.dart' hide ChatScreen;
 import 'package:my_flutter_mapwash/Status/API/api_status.dart';
 import 'package:my_flutter_mapwash/Status/realtime_status.dart';
 
 class Status extends StatefulWidget {
   const Status({super.key});
-  
 
   @override
   _StatusState createState() => _StatusState();
@@ -167,13 +167,19 @@ class _StatusState extends State<Status> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                          chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
-                          deviceId: device_id,
-                          title: title,     // อาจใช้เป็นชื่อหัวแชต
-                          ),
+                      builder: (context) => Chat222(),
                     ),
                   );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => ChatScreen(
+                  //         chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
+                  //         deviceId: device_id,
+                  //         title: title,     // อาจใช้เป็นชื่อหัวแชต
+                  //         ),
+                  //   ),
+                  // );
                   // Navigator.push(
                   //   context,
                   //   MaterialPageRoute(
