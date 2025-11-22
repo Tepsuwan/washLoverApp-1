@@ -148,23 +148,23 @@ class _Chat222State extends State<Chat222> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 color: Colors.grey[200],
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _textController,
-                        decoration:
-                            const InputDecoration(hintText: 'พิมพ์ข้อความ...'),
-                        onSubmitted: (_) =>
-                            _elementsReady ? _sendMessage() : null,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.send),
-                      onPressed: _elementsReady ? _sendMessage : null,
-                    ),
-                  ],
-                ),
+                // child: Row(
+                //   children: [
+                //     Expanded(
+                //       child: TextField(
+                //         controller: _textController,
+                //         decoration:
+                //             const InputDecoration(hintText: 'พิมพ์ข้อความ...'),
+                //         onSubmitted: (_) =>
+                //             _elementsReady ? _sendMessage() : null,
+                //       ),
+                //     ),
+                //     IconButton(
+                //       icon: const Icon(Icons.send),
+                //       onPressed: _elementsReady ? _sendMessage : null,
+                //     ),
+                //   ],
+                // ),
               ),
             ],
           ),
