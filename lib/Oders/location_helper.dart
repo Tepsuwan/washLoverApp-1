@@ -6,11 +6,9 @@ class location_helper {
   static Future<Map<String, dynamic>?> getCurrentLocationUser() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied ||
-            permission == LocationPermission.deniedForever) {
+        if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
           return null;
         }
       }
@@ -18,14 +16,14 @@ class location_helper {
         desiredAccuracy: LocationAccuracy.low,
       );
       print("🔐 position: $position");
+      await setLocaleIdentifier('th_TH');
       final placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
-        String address =
-            '${p.name}, ${p.subLocality}, ${p.locality}, ${p.administrativeArea}, ${p.postalCode}';
+        String address = '${p.name}, ${p.subLocality}, ${p.locality}, ${p.administrativeArea}, ${p.postalCode}';
         return {
           'address': address,
           'latlng': LatLng(position.latitude, position.longitude),

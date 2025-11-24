@@ -8,8 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class address_user extends StatefulWidget {
   final Function(String address, LatLng location) onLocationPicked;
 
-  const address_user({Key? key, required this.onLocationPicked})
-      : super(key: key);
+  const address_user({Key? key, required this.onLocationPicked}) : super(key: key);
 
   @override
   State<address_user> createState() => _address_userState();
@@ -28,8 +27,9 @@ class _address_userState extends State<address_user> {
   }
 
   Future<void> _loadCurrentLocation() async {
+    print('_loadCurrentLocation');
     final locationData = await location_helper.getCurrentLocationUser();
-    if (!mounted) return;
+    // if (!mounted) return;
     if (locationData != null) {
       final LatLng currentLatLng = locationData['latlng'];
       final String currentAddress = locationData['address'];
@@ -62,8 +62,7 @@ class _address_userState extends State<address_user> {
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
         setState(() {
-          _selectedAddress =
-              '${p.name}, ${p.subLocality}, ${p.locality}, ${p.administrativeArea}, ${p.postalCode}';
+          _selectedAddress = '${p.name}, ${p.subLocality}, ${p.locality}, ${p.administrativeArea}, ${p.postalCode}';
         });
       }
     } catch (e) {
@@ -127,8 +126,7 @@ class _address_userState extends State<address_user> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
                     onSubmitted: (_) => _searchLocation(),
                   ),
@@ -145,25 +143,31 @@ class _address_userState extends State<address_user> {
 
           // Google Map
           Expanded(
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: LatLng(13.7563, 100.5018), // Bangkok
-                zoom: 16,
+            child: AbsorbPointer(
+              absorbing: _selectedLocation != null ? false : true,
+              child: GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(13.7563, 100.5018), // Bangkok
+                  zoom: 16,
+                ),
+                onMapCreated: (controller) {
+                  mapController = controller;
+                },
+                onTap: (latLng) {
+                  print(_selectedLocation);
+                  if (_selectedLocation != null) {
+                    _updateLocation(latLng);
+                  }
+                },
+                markers: _selectedLocation != null
+                    ? {
+                        Marker(
+                          markerId: MarkerId("selected"),
+                          position: _selectedLocation!,
+                        )
+                      }
+                    : {},
               ),
-              onMapCreated: (controller) {
-                mapController = controller;
-              },
-              onTap: (latLng) {
-                _updateLocation(latLng);
-              },
-              markers: _selectedLocation != null
-                  ? {
-                      Marker(
-                        markerId: MarkerId("selected"),
-                        position: _selectedLocation!,
-                      )
-                    }
-                  : {},
             ),
           ),
 

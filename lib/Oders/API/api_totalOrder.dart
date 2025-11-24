@@ -1,59 +1,118 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_mapwash/Oders/API/api_saveorder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class Status {
+  bool status;
+  Map<String, dynamic> messageJson;
+  Status({required this.status, required this.messageJson});
+}
+
 class ApiPost {
-  static Future<bool> updateLocation({
+  static Future<Status> updateLocation({
     required double lat,
     required double lng,
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token') ?? '';
     String endpoint = prefs.getString('endpoint') ?? '';
+    Status status = Status(status: false, messageJson: {});
 
     try {
-      final response = await http.post(
-        Uri.parse("$endpoint/api/member/update_location"),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
+      Map<String, dynamic> header = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      final dio = Dio();
+      String path = '$endpoint/api/member/update_location';
+      print(path);
+      //
+      // print(header);
+
+      final resApi = await dio.post(
+        path,
+        data: {
           "latitude": lat,
           "longitude": lng,
-        }),
+        },
+        options: Options(headers: header, validateStatus: (_) => true),
       );
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        await APICartSet.sendCartOk(
-          "${data['device_id']}",
-          [
-            {
-              "product_id": 101,
-              "quantity": 2,
-              "price": 99.0,
-            },
-            {
-              "product_id": 102,
-              "quantity": 1,
-              "price": 199.0,
-            },
-          ],
-        );
-        deleteCart();
-        if (data['status'] == 'success') {
-          return true;
-        }
+      print(resApi);
+      print(resApi.statusCode);
+      if (resApi.statusCode == 200) {
+        // final data = json.decode(resApi.data);
+        // await APICartSet.sendCartOk(
+        //   "${data['device_id']}",
+        //   [
+        //     {
+        //       "product_id": 101,
+        //       "quantity": 2,
+        //       "price": 99.0,
+        //     },
+        //     {
+        //       "product_id": 102,
+        //       "quantity": 1,
+        //       "price": 199.0,
+        //     },
+        //   ],
+        // );
+        // deleteCart();
+        // if (data['status'] == 'success') {
+        //   status.status = true;
+        // } else {
+        //   status.status = false;
+        // }
+        status.messageJson = resApi.data;
+        status.status = true;
       } else {
-        print("Error: ${response.statusCode}");
+        status.messageJson = resApi.data;
       }
-      return false;
+      // final response = await http.post(
+      //   Uri.parse("$endpoint/api/member/update_location"),
+      //   headers: {
+      //     'Authorization': 'Bearer $token',
+      //     'Content-Type': 'application/json; charset=UTF-8',
+      //   },
+      //   body: jsonEncode({
+      //     "latitude": lat,
+      //     "longitude": lng,
+      //   }),
+      // );
+      // print(response.body);
+      // if (response.statusCode == 200) {
+      //   final data = json.decode(response.body);
+      //   await APICartSet.sendCartOk(
+      //     "${data['device_id']}",
+      //     [
+      //       {
+      //         "product_id": 101,
+      //         "quantity": 2,
+      //         "price": 99.0,
+      //       },
+      //       {
+      //         "product_id": 102,
+      //         "quantity": 1,
+      //         "price": 199.0,
+      //       },
+      //     ],
+      //   );
+      //   deleteCart();
+      //   if (data['status'] == 'success') {
+      //     return true;
+      //   }
+      // } else {
+      //   print("Error: ${response.statusCode}");
+      // }
+      // return status;
     } catch (e) {
       print("Exception: $e");
-      return false;
+      status.messageJson = {"error": e};
+
+      // return false;
     }
+    return status;
   }
 
   static Future<bool> deleteCart() async {

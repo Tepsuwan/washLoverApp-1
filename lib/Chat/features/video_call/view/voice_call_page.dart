@@ -15,29 +15,29 @@ class VoiceCallPage extends StatefulWidget {
 }
 
 class _VoiceCallPageState extends State<VoiceCallPage> {
-  late VoiceCallController agoraController;
+  // late VoiceCallController agoraController;
 
-  @override
-  void initState() {
-    super.initState();
-
-    agoraController = Get.put(
-      VoiceCallController(channel: widget.channelName),
-      permanent: false,
-    );
-  }
-
-  Future<void> _endCall() async {
-    agoraController.endCall();
-
-    if (mounted) Navigator.pop(context);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //
+  //   agoraController = Get.put(
+  //     VoiceCallController(channel: widget.channelName),
+  //     permanent: false,
+  //   );
+  // }
+  //
+  // Future<void> _endCall() async {
+  //   agoraController.endCall();
+  //
+  //   if (mounted) Navigator.pop(context);
+  // }
 
   @override
   void dispose() {
-    if (Get.isRegistered<VoiceCallController>()) {
-      Get.delete<VoiceCallController>();
-    }
+    // if (Get.isRegistered<VoiceCallController>()) {
+    //   Get.delete<VoiceCallController>();
+    // }
     super.dispose();
   }
 
@@ -57,118 +57,118 @@ class _VoiceCallPageState extends State<VoiceCallPage> {
                 child: Obx(() {
                   return Column(
                     children: [
-                      Text(
-                        '${agoraController.remoteUsers.length}',
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        agoraController.meetingDurationTxt.value,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      // Text(
+                      //   '${agoraController.remoteUsers.length}',
+                      //   style: const TextStyle(
+                      //     color: Colors.red,
+                      //     fontSize: 28,
+                      //     fontWeight: FontWeight.w500,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 10),
+                      // Text(
+                      //   agoraController.meetingDurationTxt.value,
+                      //   style: const TextStyle(
+                      //     color: Colors.white,
+                      //     fontSize: 28,
+                      //     fontWeight: FontWeight.w500,
+                      //   ),
+                      // ),
                     ],
                   );
                 }),
               ),
 
               // CONTROL BUTTONS 3x2
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      /// Mute button
-                      Obx(() => _buildControlButton(
-                            icon: agoraController.isMuted.value
-                                ? Icons.mic_off
-                                : Icons.mic,
-                            label: 'mute',
-                            onPressed: agoraController.toggleMute,
-                            backgroundColor: agoraController.isMuted.value
-                                ? Colors.white
-                                : Colors.white54,
-                            iconColor: agoraController.isMuted.value
-                                ? Colors.black
-                                : Colors.white,
-                            iconSize: 35,
-                          )),
-
-                      _buildControlButtonNon(
-                        icon: Icons.dialpad,
-                        label: 'keypad',
-                        onPressed: () {},
-                        iconSize: 35,
-                      ),
-
-                      /// Speaker button
-                      Obx(() => _buildControlButton(
-                            icon: agoraController.isSpeakerOn.value
-                                ? Icons.volume_up
-                                : Icons.volume_down,
-                            label: 'speaker',
-                            onPressed: agoraController.toggleSpeaker,
-                            backgroundColor: agoraController.isSpeakerOn.value
-                                ? Colors.white
-                                : Colors.white54,
-                            iconColor: agoraController.isSpeakerOn.value
-                                ? Colors.black
-                                : Colors.white,
-                            iconSize: 35,
-                          )),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildControlButtonNon(
-                        icon: Icons.add,
-                        label: 'add call',
-                        onPressed: () {},
-                        iconSize: 35,
-                      ),
-                      _buildControlButtonNon(
-                        icon: Icons.videocam,
-                        label: 'FaceTime',
-                        onPressed: () {},
-                        iconSize: 35,
-                      ),
-                      _buildControlButtonNon(
-                        icon: Icons.group,
-                        label: 'contacts',
-                        onPressed: () {},
-                        iconSize: 35,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              // END CALL BUTTON
-              GestureDetector(
-                onTap: _endCall,
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.call_end,
-                    size: 35,
-                    color: Colors.white,
-                  ),
-                ),
-              )
+              // Column(
+              //   children: [
+              //     Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //       children: [
+              //         /// Mute button
+              //         Obx(() => _buildControlButton(
+              //               icon: agoraController.isMuted.value
+              //                   ? Icons.mic_off
+              //                   : Icons.mic,
+              //               label: 'mute',
+              //               onPressed: agoraController.toggleMute,
+              //               backgroundColor: agoraController.isMuted.value
+              //                   ? Colors.white
+              //                   : Colors.white54,
+              //               iconColor: agoraController.isMuted.value
+              //                   ? Colors.black
+              //                   : Colors.white,
+              //               iconSize: 35,
+              //             )),
+              //
+              //         _buildControlButtonNon(
+              //           icon: Icons.dialpad,
+              //           label: 'keypad',
+              //           onPressed: () {},
+              //           iconSize: 35,
+              //         ),
+              //
+              //         /// Speaker button
+              //         Obx(() => _buildControlButton(
+              //               icon: agoraController.isSpeakerOn.value
+              //                   ? Icons.volume_up
+              //                   : Icons.volume_down,
+              //               label: 'speaker',
+              //               onPressed: agoraController.toggleSpeaker,
+              //               backgroundColor: agoraController.isSpeakerOn.value
+              //                   ? Colors.white
+              //                   : Colors.white54,
+              //               iconColor: agoraController.isSpeakerOn.value
+              //                   ? Colors.black
+              //                   : Colors.white,
+              //               iconSize: 35,
+              //             )),
+              //       ],
+              //     ),
+              //     const SizedBox(height: 30),
+              //     Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //       children: [
+              //         _buildControlButtonNon(
+              //           icon: Icons.add,
+              //           label: 'add call',
+              //           onPressed: () {},
+              //           iconSize: 35,
+              //         ),
+              //         _buildControlButtonNon(
+              //           icon: Icons.videocam,
+              //           label: 'FaceTime',
+              //           onPressed: () {},
+              //           iconSize: 35,
+              //         ),
+              //         _buildControlButtonNon(
+              //           icon: Icons.group,
+              //           label: 'contacts',
+              //           onPressed: () {},
+              //           iconSize: 35,
+              //         ),
+              //       ],
+              //     ),
+              //   ],
+              // ),
+              //
+              // // END CALL BUTTON
+              // GestureDetector(
+              //   onTap: _endCall,
+              //   child: Container(
+              //     width: 70,
+              //     height: 70,
+              //     decoration: const BoxDecoration(
+              //       color: Colors.red,
+              //       shape: BoxShape.circle,
+              //     ),
+              //     child: const Icon(
+              //       Icons.call_end,
+              //       size: 35,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // )
             ],
           ),
         ),

@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:my_flutter_mapwash/Chat/chat.dart';
 import 'package:my_flutter_mapwash/Chat/test.dart';
-import 'package:my_flutter_mapwash/Chat_socket/chat_page.dart' hide ChatScreen;
 import 'package:my_flutter_mapwash/Status/API/api_status.dart';
 import 'package:my_flutter_mapwash/Status/realtime_status.dart';
+
+import '../Chat_socket/chat_screen.dart';
 
 class Status extends StatefulWidget {
   const Status({super.key});
@@ -39,8 +39,7 @@ class _StatusState extends State<Status> {
     // ยิงทุก 5 วินาที
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
       setState(() {
-        _futureCache
-            .clear(); // เคลียร์ cache เพื่อ FutureBuilder จะเรียก API ใหม่
+        _futureCache.clear(); // เคลียร์ cache เพื่อ FutureBuilder จะเรียก API ใหม่
       });
     });
   }
@@ -106,6 +105,7 @@ class _StatusState extends State<Status> {
     required String time,
     required String id,
     required String device_id,
+    required int status,
   }) {
     return GestureDetector(
       onTap: () {
@@ -161,37 +161,38 @@ class _StatusState extends State<Status> {
               ),
               const SizedBox(width: 8),
               // ปุ่มไอคอนแชต
-              IconButton(
-                icon: const Icon(Icons.chat, color: Colors.blueAccent),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Chat222(),
-                    ),
-                  );
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => ChatScreen(
-                  //         chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
-                  //         deviceId: device_id,
-                  //         title: title,     // อาจใช้เป็นชื่อหัวแชต
-                  //         ),
-                  //   ),
-                  // );
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => ChatApp(
-                  //         // chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
-                  //         // deviceId: device_id,
-                  //         // title: title,     // อาจใช้เป็นชื่อหัวแชต
-                  //         ),
-                  //   ),
-                  // );
-                },
-              ),
+              if (status != 1)
+                IconButton(
+                  icon: const Icon(Icons.chat, color: Colors.blueAccent),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(device_id),
+                      ),
+                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => ChatScreen(
+                    //         chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
+                    //         deviceId: device_id,
+                    //         title: title,     // อาจใช้เป็นชื่อหัวแชต
+                    //         ),
+                    //   ),
+                    // );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => ChatApp(
+                    //         // chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
+                    //         // deviceId: device_id,
+                    //         // title: title,     // อาจใช้เป็นชื่อหัวแชต
+                    //         ),
+                    //   ),
+                    // );
+                  },
+                ),
             ],
           ),
         ),
@@ -237,19 +238,18 @@ class _StatusState extends State<Status> {
         centerTitle: false,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: _statusData.isEmpty
             ? _buildEmptyStatus()
             : ListView.builder(
                 itemCount: _statusData.length,
                 itemBuilder: (context, index) {
                   final order = _statusData[index];
-                  final orderStatus =
-                      int.tryParse(order['status']?.toString() ?? '0') ?? 0;
+                  // print(order);
+                  final orderStatus = int.tryParse(order['status']?.toString() ?? '0') ?? 0;
                   if (orderStatus == 4) return const SizedBox.shrink();
 
-                  final price =
-                      double.tryParse(order['price']?.toString() ?? '0') ?? 0.0;
+                  final price = double.tryParse(order['price']?.toString() ?? '0') ?? 0.0;
                   final statusInfo = getStatusInfo(orderStatus);
                   final deviceId = order['device_id'].toString();
                   final orderId = order['id'].toString();
@@ -260,8 +260,7 @@ class _StatusState extends State<Status> {
                       String apiText = '...';
                       Color apiColor = statusInfo['color'];
                       if (snapshot.hasData && snapshot.data != null) {
-                        String rawStatus =
-                            snapshot.data!['status']?.toString() ?? '';
+                        String rawStatus = snapshot.data!['status']?.toString() ?? '';
                         int statusInt = int.tryParse(rawStatus) ?? 0;
                         final statusFromApi = getStatusInfo(statusInt);
                         apiText = statusFromApi['text'];
@@ -272,13 +271,13 @@ class _StatusState extends State<Status> {
                         context: context,
                         icon: Icons.online_prediction_sharp,
                         color: apiColor,
-                        title: apiText,
+                        title: '$apiText ${order['device_id']}',
                         subtitle: formatDate(order['set_at'] ?? ''),
-                        amount:
-                            '฿${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
+                        amount: '฿${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
                         time: formatTime(order['set_at'] ?? ''),
                         id: orderId,
                         device_id: deviceId,
+                        status: order['status'],
                       );
                     },
                   );
