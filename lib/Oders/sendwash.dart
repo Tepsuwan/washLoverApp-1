@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:my_flutter_mapwash/Oders/API/api_sendwash.dart';
 import 'package:my_flutter_mapwash/Oders/API/api_saveorder.dart';
 import 'package:my_flutter_mapwash/Oders/address_user.dart';
@@ -44,12 +44,11 @@ class _sendwashState extends State<sendwash> {
   void initState() {
     super.initState();
     _geoLocator();
-    // _loadSelectedItem();
+    loadOptions();
   }
 
   @override
   void dispose() {
-    // noteController.dispose(); // เมื่อ widget ถูกทิ้ง ให้ทำการลบ controller
     super.dispose();
   }
 
@@ -65,7 +64,8 @@ class _sendwashState extends State<sendwash> {
     });
 
     try {
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile =
+          await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         setState(() {
           selectedOptions['basketImage'] = pickedFile.path;
@@ -164,7 +164,8 @@ class _sendwashState extends State<sendwash> {
         double lng;
         if (result['latlng'] is String) {
           String latlngString = result['latlng'];
-          String cleaned = latlngString.replaceAll("LatLng(", "").replaceAll(")", "");
+          String cleaned =
+              latlngString.replaceAll("LatLng(", "").replaceAll(")", "");
           List<String> parts = cleaned.split(',');
           lat = double.parse(parts[0]);
           lng = double.parse(parts[1]);
@@ -184,7 +185,8 @@ class _sendwashState extends State<sendwash> {
 
   Widget _buildClothingType() {
     // ✅ ดึงข้อมูลประเภทเสื้อผ้า
-    List<Map<String, dynamic>> clothingTypes = API_sendwash().getClothingTypes();
+    List<Map<String, dynamic>> clothingTypes =
+        API_sendwash().getClothingTypes();
     return Column(
       children: [
         // ✅ ที่อยู่ (GestureDetector)
@@ -218,7 +220,9 @@ class _sendwashState extends State<sendwash> {
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    selectedAddress.isNotEmpty ? selectedAddress : 'กำลังค้นหาตำแหน่ง...',
+                    selectedAddress.isNotEmpty
+                        ? selectedAddress
+                        : 'กำลังค้นหาตำแหน่ง...',
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 13, color: Colors.grey),
@@ -241,7 +245,8 @@ class _sendwashState extends State<sendwash> {
             itemCount: clothingTypes.length,
             itemBuilder: (context, index) {
               var item = clothingTypes[index];
-              bool isSelected = selectedOptions['clothingType'] == item['value'];
+              bool isSelected =
+                  selectedOptions['clothingType'] == item['value'];
               return GestureDetector(
                 onTap: () {
                   setState(() {
@@ -258,7 +263,9 @@ class _sendwashState extends State<sendwash> {
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.blue[50] : Colors.white,
                         border: Border.all(
-                          color: isSelected ? Colors.blue : const Color.fromARGB(255, 227, 227, 227),
+                          color: isSelected
+                              ? Colors.blue
+                              : const Color.fromARGB(255, 227, 227, 227),
                           width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(10),
@@ -273,7 +280,8 @@ class _sendwashState extends State<sendwash> {
                               topRight: Radius.circular(8),
                             ),
                             child: AspectRatio(
-                              aspectRatio: 4 / 3, // ✅ กำหนดอัตราส่วนภาพให้เหมาะสม
+                              aspectRatio:
+                                  4 / 3, // ✅ กำหนดอัตราส่วนภาพให้เหมาะสม
                               child: Image.asset(
                                 item['image'],
                                 fit: BoxFit.contain,
@@ -286,7 +294,8 @@ class _sendwashState extends State<sendwash> {
                             child: Text(
                               item['name'],
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
                           SizedBox(height: 10),
@@ -299,12 +308,14 @@ class _sendwashState extends State<sendwash> {
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: Row(
                           children: [
-                            Icon(Icons.water_drop_sharp, color: Colors.blue[200], size: 16),
+                            Icon(Icons.water_drop_sharp,
+                                color: Colors.blue[200], size: 16),
                             SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 closestBranch,
-                                style: TextStyle(fontSize: 13, color: Colors.grey),
+                                style:
+                                    TextStyle(fontSize: 13, color: Colors.grey),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                               ),
@@ -322,12 +333,36 @@ class _sendwashState extends State<sendwash> {
     );
   }
 
-  Widget _buildDetergentSoftenerList(String type, String key) {
-    List<dynamic> options = _items.where((item) => item['type'] == type).toList();
+  String mapType(String type) {
+    if (type == 'detergent') return 'detergent';
+    if (type == 'softener') return 'softener';
+    return type;
+  }
 
+  List<Map<String, dynamic>> detergentOptions = [];
+  List<Map<String, dynamic>> softenerOptions = [];
+  
+  bool loading = true;
+
+  Future<void> loadOptions() async {
+    detergentOptions = await API_sendwash.getDefaultOptions('detergent');
+    softenerOptions = await API_sendwash.getDefaultOptions('softener');
+
+    setState(() => loading = false);
+  }
+
+  Widget _buildDetergentSoftenerList(String type, String key) {
+    String apiType = mapType(type);
+    List<Map<String, dynamic>> options = _items
+        .where((item) => item['type'] == apiType)
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
     if (options.isEmpty) {
-      // เรียกใช้เมท็อดจากคลาส
-      options = API_sendwash().getDefaultOptions(type);
+      if (apiType == 'detergent') {
+        options = detergentOptions;
+      } else if (apiType == 'softener') {
+        options = softenerOptions;
+      }
     }
 
     return GridView.builder(
@@ -378,21 +413,30 @@ class _sendwashState extends State<sendwash> {
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.black),
                     children: [
                       WidgetSpan(
                         alignment: PlaceholderAlignment.middle,
                         child: Container(
-                          margin: EdgeInsets.only(left: 8),
-                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+                          margin: EdgeInsets.only(left: 0),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 0, horizontal: 8),
                           decoration: BoxDecoration(
-                            color: item['type'] == 'softener' ? Colors.pink[300] : Colors.blue[300],
+                            color: item['type'] == 'softener'
+                                ? Colors.pink[300]
+                                : Colors.blue[300],
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: Text(
                             item['name'],
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: Colors.white),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
@@ -414,7 +458,9 @@ class _sendwashState extends State<sendwash> {
                       Icons.remove,
                       color: quantity > 0 ? Colors.red : Colors.grey,
                     ),
-                    onPressed: quantity > 0 ? () => _updateQuantity(key, item['id'], -1) : null,
+                    onPressed: quantity > 0
+                        ? () => _updateQuantity(key, item['id'], -1)
+                        : null,
                   ),
                   Text(quantity.toString()),
                   IconButton(
@@ -436,7 +482,8 @@ class _sendwashState extends State<sendwash> {
   Map<String, dynamic> selectedItems = {}; // เก็บ item ที่เลือก
 
   Widget _buildOptionList(String type, String key) {
-    List<dynamic> options = _items.where((item) => item['type'] == type).toList();
+    List<dynamic> options =
+        _items.where((item) => item['type'] == type).toList();
     options = API_sendwash().getwashing(type);
     return GridView.builder(
       padding: EdgeInsets.all(10),
@@ -464,7 +511,9 @@ class _sendwashState extends State<sendwash> {
             decoration: BoxDecoration(
               color: isSelected ? Colors.blue[50] : Colors.white,
               border: Border.all(
-                color: isSelected ? Colors.blue : const Color.fromARGB(255, 233, 233, 233),
+                color: isSelected
+                    ? Colors.blue
+                    : const Color.fromARGB(255, 233, 233, 233),
                 width: 2,
               ),
               borderRadius: BorderRadius.circular(8),
@@ -474,7 +523,8 @@ class _sendwashState extends State<sendwash> {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 20.0), // เพิ่ม padding ด้านบน
+                    padding: const EdgeInsets.only(
+                        top: 20.0), // เพิ่ม padding ด้านบน
                     child: item['image'].toString().startsWith('http')
                         ? Image.network(
                             item['image'],
@@ -519,7 +569,8 @@ class _sendwashState extends State<sendwash> {
           ),
           SizedBox(height: 8),
           TextField(
-            controller: noteController, // ใช้ TextEditingController ที่สร้างขึ้น
+            controller:
+                noteController, // ใช้ TextEditingController ที่สร้างขึ้น
             onChanged: (value) {
               setState(() {
                 selectedOptions['note'] = value;
@@ -585,7 +636,9 @@ class _sendwashState extends State<sendwash> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: Text(
-          closestBranch == 'ไม่พบสาขาที่ใกล้ที่สุด' ? 'ค้นหาสาขาที่ใกล้ที่สุด' : 'เลือกรายการซัก',
+          closestBranch == 'ไม่พบสาขาที่ใกล้ที่สุด'
+              ? 'ค้นหาสาขาที่ใกล้ที่สุด'
+              : 'เลือกรายการซัก',
           style: TextStyle(
             color: const Color.fromARGB(255, 203, 203, 203),
             fontSize: 18,

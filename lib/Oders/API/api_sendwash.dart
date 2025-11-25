@@ -26,16 +26,45 @@ class API_sendwash {
     ];
   }
 
-  List<Map<String, dynamic>> getDefaultOptions(String type) {
-    return List.generate(4, (index) {
-      return {
-        'id': 'sample_${index + 1}',
-        'name': 'น้ำยาซัก&ปรับผ้านุ่ม',
-        'image': 'assets/images/notag.png',
-        'price': 5 + index,
-        'type': type,
-      };
-    });
+  // List<Map<String, dynamic>> getDefaultOptions(String type) {
+  //   return List.generate(4, (index) {
+  //     return {
+  //       'id': 'sample_${index + 1}',
+  //       'name': 'น้ำยาซัก&ปรับผ้านุ่ม',
+  //       'image': 'assets/images/notag.png',
+  //       'price': 5 + index,
+  //       'type': type,
+  //     };
+  //   });
+  // }
+
+  static Future<List<Map<String, dynamic>>> getDefaultOptions(
+      String type) async {
+    final url = Uri.parse(
+        'https://washlover-1bef6-default-rtdb.firebaseio.com/mocklist.json');
+
+    final response = await http.get(url);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load mock list');
+    }
+
+    final data = json.decode(response.body);
+
+    if (data is List) {
+      return data
+          .where((item) => item['type'] == type)
+          .map<Map<String, dynamic>>((item) => Map<String, dynamic>.from(item))
+          .toList();
+    }
+
+    if (data is Map) {
+      return data.values
+          .map((item) => Map<String, dynamic>.from(item))
+          .where((item) => item['type'] == type)
+          .toList();
+    }
+
+    return [];
   }
 
   List<Map<String, dynamic>> getwashing(String type) {
@@ -62,7 +91,7 @@ class API_sendwash {
 
       return {
         'id': 'sample_${index + 1}',
-        'name': typeselect+index.toString(),
+        'name': typeselect + index.toString(),
         'image': sampleImage,
         'price': 40 + index,
         'type': type,

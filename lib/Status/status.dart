@@ -271,7 +271,7 @@ class _StatusState extends State<Status> {
                         context: context,
                         icon: Icons.online_prediction_sharp,
                         color: apiColor,
-                        title: '$apiText ${order['device_id']}',
+                        title: '$apiText', // ${order['device_id']}
                         subtitle: formatDate(order['set_at'] ?? ''),
                         amount: '฿${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
                         time: formatTime(order['set_at'] ?? ''),
