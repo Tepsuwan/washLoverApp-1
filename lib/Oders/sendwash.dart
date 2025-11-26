@@ -356,7 +356,7 @@ class _sendwashState extends State<sendwash> {
     washingOptions = await API_sendwash.getDefaultOptions('washing');
     temperatureOptions = await API_sendwash.getDefaultOptions('temperature');
     dryerOptions = await API_sendwash.getDefaultOptions('dryer');
-
+    if (!mounted) return;
     setState(() => loading = false);
   }
 
