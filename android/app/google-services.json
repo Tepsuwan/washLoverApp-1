@@ -1,41 +1,21 @@
 {
   "project_info": {
-    "project_number": "576948336548",
-    "firebase_url": "https://android-dcbef-default-rtdb.firebaseio.com",
-    "project_id": "android-dcbef",
-    "storage_bucket": "android-dcbef.firebasestorage.app"
+    "project_number": "113772128014",
+    "project_id": "washlover-washlover",
+    "storage_bucket": "washlover-washlover.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:576948336548:android:27570c8ee6d4d3893d7331",
+        "mobilesdk_app_id": "1:113772128014:android:0df8663954f4642ac5d95f",
         "android_client_info": {
-          "package_name": "com.mplus.my_flutter_mapwash"
+          "package_name": "com.washlover.washlover"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAwHq2zA_56I8xF10gOrfk5GnZYPvsczl4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:576948336548:android:481408d8e1f99aea3d7331",
-        "android_client_info": {
-          "package_name": "my_washlover.com"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAwHq2zA_56I8xF10gOrfk5GnZYPvsczl4"
+          "current_key": "AIzaSyDcHqdRAvOlJe_vs9d3HQEZ6Dt253dfpd8"
         }
       ],
       "services": {

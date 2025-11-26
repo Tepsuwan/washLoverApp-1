@@ -1,4 +1,4 @@
-package com.mplus.my_flutter_mapwash
+package com.washlover.washlover
 
 import io.flutter.embedding.android.FlutterActivity
 

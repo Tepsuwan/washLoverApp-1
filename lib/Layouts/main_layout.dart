@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_mapwash/Home/home.dart';
 import 'package:my_flutter_mapwash/Oders/sendwash.dart';
@@ -159,13 +160,6 @@ class _MainLayoutState extends State<MainLayout> {
   }
 }
 
-
-
-
-
-
-
-
 // import 'dart:convert';
 // import 'package:flutter/material.dart';
 // // import 'package:my_flutter_mapwash/pages/banc.dart';
@@ -192,17 +186,17 @@ class _MainLayoutState extends State<MainLayout> {
 //   // หากต้องการให้หน้าหลัก (HomeScreen) เป็นหน้าเริ่มต้น
 //   // หน้าหลักคือ index 1 ของ _pages
 //   int _selectedIndex = 1; // เปลี่ยนเป็น 1 เพื่อให้เริ่มต้นที่ HomeScreen
-  
+
 //   String workStatus = '';
 //   String? phone;
 //   bool hasUnreadOrders = false;
-  
+
 //   // Widget Placeholder (ตัวอย่างสมมติเพื่อให้โค้ดคอมไพล์ได้)
 //   final Widget Wallet = const Center(child: Text('กระเป๋าเงิน (Wallet)'));
 //   final Widget HomeScreen = const Center(child: Text('หน้าหลัก (Home)'));
 //   final Widget LaundrySelection = const Center(child: Text('ส่งซัก (Laundry)'));
 //   final Widget Status = const Center(child: Text('สถานะ (Status)'));
-//   final Widget Header = const Placeholder(); 
+//   final Widget Header = const Placeholder();
 
 //   @override
 //   void initState() {
@@ -216,7 +210,7 @@ class _MainLayoutState extends State<MainLayout> {
 //       // Index 2 ถูกสงวนไว้สำหรับการกด FAB
 //       // คุณสามารถเพิ่ม Logic สำหรับการสแกน QR Code ที่นี่
 //       print('Scan button tapped - Index: $index');
-//       return; 
+//       return;
 //     }
 
 //     // ปรับ Index สำหรับ _pages:
@@ -229,7 +223,7 @@ class _MainLayoutState extends State<MainLayout> {
 //     if (index > 2) {
 //       newIndex = index - 1;
 //     }
-    
+
 //     // ตั้งค่า _selectedIndex ใหม่
 //     if (_selectedIndex != newIndex) {
 //       setState(() {
@@ -250,7 +244,7 @@ class _MainLayoutState extends State<MainLayout> {
 //       print('Phone is not available.');
 //     }
 //   }
-  
+
 //   @override
 //   Widget build(BuildContext context) {
 //     List<Widget> _pages = [
@@ -260,7 +254,6 @@ class _MainLayoutState extends State<MainLayout> {
 //       Status,
 //     ];
 
-   
 //     return Scaffold(
 //       // *** 1. เพิ่ม extendBody: true เพื่อให้ body ทะลุลงไปใต้ BottomAppBar
 //       extendBody: true,
@@ -273,28 +266,28 @@ class _MainLayoutState extends State<MainLayout> {
 //         // ปรับ index ให้ถูกต้องตามการเรียงใน _pages
 //         child: _pages[_selectedIndex > 1 ? _selectedIndex - 1 : _selectedIndex],
 //       ),
-      
+
 //       floatingActionButton: FloatingActionButton(
 //         // Index 2 คือ 'Scan' button (ในมุมมองของ BottomNavigationBar Item)
-//         onPressed: () => _onItemTapped(2), 
-//         backgroundColor: const Color.fromARGB(255, 8, 119, 210), 
+//         onPressed: () => _onItemTapped(2),
+//         backgroundColor: const Color.fromARGB(255, 8, 119, 210),
 //         shape: const CircleBorder(),
 //         child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 40),
 //         elevation: 8.0,
 //       ),
 //       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      
+
 //       // *** 2. เปลี่ยนจาก Container และ BottomNavigationBar เป็น BottomAppBar ***
 //       bottomNavigationBar: BottomAppBar(
 //         color: Colors.white,
 //         // *** 3. กำหนด shape ให้มีรอยเว้า ***
 //         shape: const CircularNotchedRectangle(),
 //         // *** 4. กำหนด clipBehavior เพื่อสร้างขอบโค้งมนที่มุมซ้าย/ขวา ***
-//         clipBehavior: Clip.antiAlias, 
+//         clipBehavior: Clip.antiAlias,
 //         // 5. กำหนดระยะห่างระหว่าง FAB กับรอยเว้า
-//         notchMargin: 6.0, 
+//         notchMargin: 6.0,
 //         elevation: 10.0, // เพิ่มเงาเพื่อให้ดูนูนออกมา
-        
+
 //         // 6. ใส่ BottomNavigationBar เดิมไว้เป็น child ของ BottomAppBar
 //         child: SizedBox(
 //           height: kBottomNavigationBarHeight, // กำหนดความสูงมาตรฐาน
