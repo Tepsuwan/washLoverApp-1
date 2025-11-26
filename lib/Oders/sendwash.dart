@@ -336,17 +336,26 @@ class _sendwashState extends State<sendwash> {
   String mapType(String type) {
     if (type == 'detergent') return 'detergent';
     if (type == 'softener') return 'softener';
+    if (type == 'washing') return 'washing';
+    if (type == 'temperature') return 'temperature';
+    if (type == 'dryer') return 'dryer';
     return type;
   }
 
   List<Map<String, dynamic>> detergentOptions = [];
   List<Map<String, dynamic>> softenerOptions = [];
-  
+  List<Map<String, dynamic>> washingOptions = [];
+  List<Map<String, dynamic>> temperatureOptions = [];
+  List<Map<String, dynamic>> dryerOptions = [];
+
   bool loading = true;
 
   Future<void> loadOptions() async {
     detergentOptions = await API_sendwash.getDefaultOptions('detergent');
     softenerOptions = await API_sendwash.getDefaultOptions('softener');
+    washingOptions = await API_sendwash.getDefaultOptions('washing');
+    temperatureOptions = await API_sendwash.getDefaultOptions('temperature');
+    dryerOptions = await API_sendwash.getDefaultOptions('dryer');
 
     setState(() => loading = false);
   }
@@ -482,9 +491,24 @@ class _sendwashState extends State<sendwash> {
   Map<String, dynamic> selectedItems = {}; // เก็บ item ที่เลือก
 
   Widget _buildOptionList(String type, String key) {
-    List<dynamic> options =
-        _items.where((item) => item['type'] == type).toList();
-    options = API_sendwash().getwashing(type);
+    // List<dynamic> options =
+    //     _items.where((item) => item['type'] == type).toList();
+    // options = API_sendwash().getwashing(type);
+
+    String apiType = mapType(type);
+    List<Map<String, dynamic>> options = _items
+        .where((item) => item['type'] == apiType)
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+    if (options.isEmpty) {
+      if (apiType == 'washing') {
+        options = washingOptions;
+      } else if (apiType == 'dryer') {
+        options = dryerOptions;
+      } else if (apiType == 'temperature') {
+        options = temperatureOptions;
+      }
+    }
     return GridView.builder(
       padding: EdgeInsets.all(10),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
