@@ -83,12 +83,12 @@ class _SignInState extends State<SignIn> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาด: ${response.statusCode}')),
+          SnackBar(content: Text('ระบุข้อมูลไม่ถูกต้อง: ${response.statusCode}')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
+        SnackBar(content: Text('เกิดข้อผิดพลาดระบุข้อมูลไม่ถูกต้อง: $e')),
       );
     } finally {
       setState(() => _isLoading = false);

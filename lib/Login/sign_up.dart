@@ -172,10 +172,10 @@ class _SignUpState extends State<SignUp> {
       } else {
         print("Error reason: ${response.reasonPhrase}");
         _showDialog("ผิดพลาด",
-            "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ (${response.statusCode})");
+            "พบข้อมูลสมาชิกนี้แล้ว (${response.statusCode})");
       }
     } catch (e) {
-      _showDialog("ผิดพลาด", "เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      _showDialog("ผิดพลาด", "พบข้อมูลสมาชิกนี้แล้ว");
       print("Exception: $e");
     }
   }
