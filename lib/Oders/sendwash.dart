@@ -491,10 +491,6 @@ class _sendwashState extends State<sendwash> {
   Map<String, dynamic> selectedItems = {}; // เก็บ item ที่เลือก
 
   Widget _buildOptionList(String type, String key) {
-    // List<dynamic> options =
-    //     _items.where((item) => item['type'] == type).toList();
-    // options = API_sendwash().getwashing(type);
-
     String apiType = mapType(type);
     List<Map<String, dynamic>> options = _items
         .where((item) => item['type'] == apiType)
