@@ -557,12 +557,17 @@ class _sendwashState extends State<sendwash> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(0.0),
                   child: Text(
-                    item['name'],
+                    item['detail'],
                     textAlign: TextAlign.center,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
+                ),
+                Text(
+                  item['name'],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[400]),
                 ),
                 Text(
                   '${item['price']} บาท',
