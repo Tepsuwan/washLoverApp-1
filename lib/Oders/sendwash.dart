@@ -10,6 +10,7 @@ import 'package:my_flutter_mapwash/Oders/location_helper.dart';
 import 'package:my_flutter_mapwash/Oders/totalOrder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:my_flutter_mapwash/Oders/total_order.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class sendwash extends StatefulWidget {
@@ -39,6 +40,38 @@ class _sendwashState extends State<sendwash> {
   bool isLoading = true; // สถานะการโหลด
   String selectedAddress = ''; // ✅ ตัวแปรที่อยู่
   LatLng? selectedLatLng; // ✅ ตัวแปรพิกัด (nullable)
+
+  String mapType(String type) {
+    if (type == 'detergent') return 'detergent';
+    if (type == 'softener') return 'softener';
+    if (type == 'washing') return 'washing';
+    if (type == 'temperature') return 'temperature';
+    if (type == 'dryer') return 'dryer';
+    return type;
+  }
+
+  List<Map<String, dynamic>> detergentOptions = [];
+  List<Map<String, dynamic>> softenerOptions = [];
+  List<Map<String, dynamic>> washingOptions = [];
+  List<Map<String, dynamic>> temperatureOptions = [];
+  List<Map<String, dynamic>> dryerOptions = [];
+
+  bool loading = true;
+
+  Future<void> loadOptions() async {
+    detergentOptions = await API_sendwash.getDefaultOptions('detergent');
+    softenerOptions = await API_sendwash.getDefaultOptions('softener');
+    washingOptions = await API_sendwash.getDefaultOptions('washing');
+    temperatureOptions = await API_sendwash.getDefaultOptions('temperature');
+    dryerOptions = await API_sendwash.getDefaultOptions('dryer');
+    if (!mounted) return;
+    setState(() => loading = false);
+  }
+
+  Future<void> _saveSelection() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selection', json.encode(selectedOptions));
+  }
 
   @override
   void initState() {
@@ -94,6 +127,7 @@ class _sendwashState extends State<sendwash> {
     }
     // กรณีเลือกชุดเครื่องนอน
     if (selectedOptions['clothingType'] == 2 && _currentPage == 5) {
+      _saveSelection();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => TotalOrder()),
@@ -106,6 +140,7 @@ class _sendwashState extends State<sendwash> {
     }
     // เสื้อผ้าปกติ
     if (_currentPage == 8) {
+      _saveSelection();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => TotalOrder()),
@@ -331,33 +366,6 @@ class _sendwashState extends State<sendwash> {
         ),
       ],
     );
-  }
-
-  String mapType(String type) {
-    if (type == 'detergent') return 'detergent';
-    if (type == 'softener') return 'softener';
-    if (type == 'washing') return 'washing';
-    if (type == 'temperature') return 'temperature';
-    if (type == 'dryer') return 'dryer';
-    return type;
-  }
-
-  List<Map<String, dynamic>> detergentOptions = [];
-  List<Map<String, dynamic>> softenerOptions = [];
-  List<Map<String, dynamic>> washingOptions = [];
-  List<Map<String, dynamic>> temperatureOptions = [];
-  List<Map<String, dynamic>> dryerOptions = [];
-
-  bool loading = true;
-
-  Future<void> loadOptions() async {
-    detergentOptions = await API_sendwash.getDefaultOptions('detergent');
-    softenerOptions = await API_sendwash.getDefaultOptions('softener');
-    washingOptions = await API_sendwash.getDefaultOptions('washing');
-    temperatureOptions = await API_sendwash.getDefaultOptions('temperature');
-    dryerOptions = await API_sendwash.getDefaultOptions('dryer');
-    if (!mounted) return;
-    setState(() => loading = false);
   }
 
   Widget _buildDetergentSoftenerList(String type, String key) {
