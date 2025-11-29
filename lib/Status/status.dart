@@ -17,6 +17,7 @@ class Status extends StatefulWidget {
 class _StatusState extends State<Status> {
   List<dynamic> _statusData = [];
   final api = ApistatusOrder();
+  int status = 0;
   Timer? _timer;
 
   // ใช้ orderId เป็น key
@@ -39,7 +40,7 @@ class _StatusState extends State<Status> {
     // ยิงทุก 5 วินาที
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
       setState(() {
-        _futureCache.clear(); // เคลียร์ cache เพื่อ FutureBuilder จะเรียก API ใหม่
+        _futureCache.clear();
       });
     });
   }
@@ -50,6 +51,7 @@ class _StatusState extends State<Status> {
       final filtered = data.where((e) => e['status'] != 4).toList();
       setState(() {
         _statusData = filtered;
+        status = _statusData[0]['status'] ?? 0;
       });
     } catch (e) {
       print('Error loading status: $e');
@@ -57,11 +59,15 @@ class _StatusState extends State<Status> {
     }
   }
 
-  Future<Map<String, dynamic>?> _getFuture(String deviceId, String orderId) {
+  Future<Map<String, dynamic>?> _getFuture(
+      String deviceId, String orderId) async {
     if (!_futureCache.containsKey(orderId)) {
       _futureCache[orderId] = api.fetchDestinationStatus(deviceId, orderId);
     }
-    return _futureCache[orderId]!;
+    Map<String, dynamic>? statusData = await _futureCache[orderId];
+    status = statusData?['status'] ?? 0;
+    print(status);
+    return statusData;
   }
 
   String formatDate(String datetime) {
@@ -171,26 +177,6 @@ class _StatusState extends State<Status> {
                         builder: (context) => ChatScreen(device_id),
                       ),
                     );
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => ChatScreen(
-                    //         chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
-                    //         deviceId: device_id,
-                    //         title: title,     // อาจใช้เป็นชื่อหัวแชต
-                    //         ),
-                    //   ),
-                    // );
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => ChatApp(
-                    //         // chatId: id,       // ส่ง id ไปยังหน้าสนทนา. ChatApp
-                    //         // deviceId: device_id,
-                    //         // title: title,     // อาจใช้เป็นชื่อหัวแชต
-                    //         ),
-                    //   ),
-                    // );
                   },
                 ),
             ],
@@ -246,10 +232,12 @@ class _StatusState extends State<Status> {
                 itemBuilder: (context, index) {
                   final order = _statusData[index];
                   // print(order);
-                  final orderStatus = int.tryParse(order['status']?.toString() ?? '0') ?? 0;
+                  final orderStatus =
+                      int.tryParse(order['status']?.toString() ?? '0') ?? 0;
                   if (orderStatus == 4) return const SizedBox.shrink();
 
-                  final price = double.tryParse(order['price']?.toString() ?? '0') ?? 0.0;
+                  final price =
+                      double.tryParse(order['price']?.toString() ?? '0') ?? 0.0;
                   final statusInfo = getStatusInfo(orderStatus);
                   final deviceId = order['device_id'].toString();
                   final orderId = order['id'].toString();
@@ -260,7 +248,8 @@ class _StatusState extends State<Status> {
                       String apiText = '...';
                       Color apiColor = statusInfo['color'];
                       if (snapshot.hasData && snapshot.data != null) {
-                        String rawStatus = snapshot.data!['status']?.toString() ?? '';
+                        String rawStatus =
+                            snapshot.data!['status']?.toString() ?? '';
                         int statusInt = int.tryParse(rawStatus) ?? 0;
                         final statusFromApi = getStatusInfo(statusInt);
                         apiText = statusFromApi['text'];
@@ -273,11 +262,12 @@ class _StatusState extends State<Status> {
                         color: apiColor,
                         title: '$apiText', // ${order['device_id']}
                         subtitle: formatDate(order['set_at'] ?? ''),
-                        amount: '฿${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
+                        amount:
+                            '฿${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
                         time: formatTime(order['set_at'] ?? ''),
                         id: orderId,
                         device_id: deviceId,
-                        status: order['status'],
+                        status: status,
                       );
                     },
                   );
