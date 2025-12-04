@@ -104,36 +104,14 @@ class _TotalOrderState extends State<TotalOrder> {
     _loadSelection();
   }
 
-  // Future<void> _loadCart() async {
-  //   try {
-  //     final data = await ApiGetCart.getCart();
-  //     setState(() {
-  //       if (data.isNotEmpty) {
-  //         items = List<Map<String, dynamic>>.from(data);
-  //       } else {
-  //         items = [];
-  //       }
-  //     });
-  //   } catch (e) {
-  //     print('Error loading cart: $e');
-  //     setState(() => items = []);
-  //   }
-  // }
-
   Future<Status> _send_update_location() async {
     Status status = Status(status: false, messageJson: {});
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       double lat = prefs.getDouble('lat') ?? 0.0;
       double lng = prefs.getDouble('lng') ?? 0.0;
-      print('lat:   ${lat}');
-      print('lng:   ${lng}');
-
       var succ = await ApiPost.updateLocation(lat: lat, lng: lng);
-
       if (succ.status) {
-        print(lat);
-        print(lng);
         status.messageJson = succ.messageJson;
         status.status = true;
       } else {
@@ -238,7 +216,6 @@ class _TotalOrderState extends State<TotalOrder> {
               ),
             ),
           ),
-
           Divider(
             color: const Color.fromARGB(5, 0, 0, 0),
             thickness: 3, // ความหนาของเส้น
@@ -261,28 +238,6 @@ class _TotalOrderState extends State<TotalOrder> {
                         children: _buildOrderDetails(),
                       ),
           ),
-
-          // Expanded(
-          //   child: ListView.builder(
-          //     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-          //     itemCount: items.length,
-          //     itemBuilder: (context, index) {
-          //       final item = items[index];
-          //       double price = double.tryParse(item['price'].toString()) ?? 0.0;
-          //       int quantity = int.tryParse(item['quantity'].toString()) ?? 1;
-          //       String imageUrl = item['image'];
-          //       return OrderCard(
-          //         title: item['name'],
-          //         subtitle: item['detail'] ?? 'ไม่พบรายละเอียด',
-          //         price: item['price'].toString(),
-          //         image: imageUrl,
-          //         quantity: quantity, // ✅ ใช้ตัวที่แปลงเป็น int แล้ว
-          //         totalPrice: (price * quantity).toInt(),
-          //       );
-          //     },
-          //   ),
-          // ),
-          // New section at the bottom
           Container(
             height: 1, // ความหนาของเส้น
             decoration: BoxDecoration(
@@ -301,6 +256,7 @@ class _TotalOrderState extends State<TotalOrder> {
           GestureDetector(
             onTap: () {
               _navigateAndDisplaySelectionPromotion(context);
+              // ตรงนี้บวกด้วย selectedCouponPromotion!['amount']
             },
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
@@ -309,8 +265,8 @@ class _TotalOrderState extends State<TotalOrder> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.confirmation_num, size: 24), // ไอคอนคูปอง
-                      SizedBox(width: 10), // เว้นระยะห่างระหว่างไอคอนกับข้อความ
+                      Icon(Icons.confirmation_num, size: 24),
+                      SizedBox(width: 10),
                       Text(
                         (selectedCouponPromotion != null &&
                                 selectedCouponPromotion!['amount'] != null &&
@@ -321,7 +277,7 @@ class _TotalOrderState extends State<TotalOrder> {
                                         selectedCouponPromotion!['amount']) >
                                     0)
                             ? 'ใช้คูปองส่วนลด ${selectedCouponPromotion!['amount']} บาท'
-                            : 'คูปองส่วนลด', // ถ้ามีการเลือกคูปองจะเปลี่ยนข้อความ
+                            : 'คูปองส่วนลด',
                         style: TextStyle(fontSize: 16),
                       )
                     ],
@@ -370,17 +326,13 @@ class _TotalOrderState extends State<TotalOrder> {
                   onPressed: () async {
                     var succ = await _send_update_location();
                     if (succ.status) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text('${succ.messageJson['message']}')),
-                      );
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => Qrcode(),
                           settings: RouteSettings(
                             arguments: {
-                              'totalPrice': 0.00,
+                              'totalPrice': totalCost,
                               'address': address ?? 'ไม่พบที่อยู่',
                               'addressBranch':
                                   addressBranch ?? 'ไม่พบสาขาที่ใกล้ที่สุด',
@@ -399,7 +351,7 @@ class _TotalOrderState extends State<TotalOrder> {
                           builder: (context) => Qrcode(),
                           settings: RouteSettings(
                             arguments: {
-                              'totalPrice': 0.00,
+                              'totalPrice': totalCost,
                               'address': address ?? 'ไม่พบที่อยู่',
                               'addressBranch':
                                   addressBranch ?? 'ไม่พบสาขาที่ใกล้ที่สุด',
@@ -435,8 +387,8 @@ class _TotalOrderState extends State<TotalOrder> {
   }
 
   List<Widget> _buildOrderDetails() {
+    double calculatedCost = 0; // ← ใช้ตัวนี้คำนวณแทน totalCost
     final List<Widget> details = [];
-    // double totalCost = 0;
 
     // ⭐ Minimal Card
     Widget buildCard(String title, List<Widget> children) {
@@ -472,15 +424,9 @@ class _TotalOrderState extends State<TotalOrder> {
       );
     }
 
-    TextStyle nameStyle = GoogleFonts.kanit(
-      fontSize: 16,
-    );
-
-    TextStyle detailStyle = GoogleFonts.kanit(
-      fontSize: 13,
-      color: Colors.grey.shade600,
-    );
-
+    TextStyle nameStyle = GoogleFonts.kanit(fontSize: 16);
+    TextStyle detailStyle =
+        GoogleFonts.kanit(fontSize: 13, color: Colors.grey.shade600);
     TextStyle priceStyle = GoogleFonts.kanit(
       fontSize: 14,
       fontWeight: FontWeight.w600,
@@ -511,7 +457,8 @@ class _TotalOrderState extends State<TotalOrder> {
       final items = detergents.entries.map((e) {
         final info = _itemDetails[e.key] ?? {};
         final price = (info['price'] ?? 0) * e.value;
-        totalCost += price;
+
+        calculatedCost += price;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
@@ -536,7 +483,8 @@ class _TotalOrderState extends State<TotalOrder> {
       final items = softeners.entries.map((e) {
         final info = _itemDetails[e.key] ?? {};
         final price = (info['price'] ?? 0) * e.value;
-        totalCost += price;
+
+        calculatedCost += price;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
@@ -557,7 +505,7 @@ class _TotalOrderState extends State<TotalOrder> {
     // ----------------------------------------------------------
     // ⭐ รายการแบบเลือกทีละตัว
     final singleSelectionCategories = {
-      'washingMachine': 'เครื่องซักผ้า',
+      'washing': 'เครื่องซักผ้า',
       'temperature': 'อุณหภูมิน้ำ',
       'dryer': 'เครื่องอบผ้า',
     };
@@ -569,7 +517,7 @@ class _TotalOrderState extends State<TotalOrder> {
       final info = _itemDetails[id.toString()];
       if (info == null) return;
 
-      totalCost += info['price'];
+      calculatedCost += info['price'];
 
       details.add(buildCard(title, [
         Row(
@@ -590,7 +538,7 @@ class _TotalOrderState extends State<TotalOrder> {
     });
 
     // ----------------------------------------------------------
-    // ⭐ TOTAL (แบบเรียบๆแต่แพง)
+    // ⭐ TOTAL (แบบเรียบๆ)
     details.add(
       Container(
         margin: const EdgeInsets.only(top: 6),
@@ -610,7 +558,7 @@ class _TotalOrderState extends State<TotalOrder> {
               ),
             ),
             Text(
-              "$totalCost บาท",
+              "$calculatedCost บาท",
               style: GoogleFonts.kanit(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -621,6 +569,9 @@ class _TotalOrderState extends State<TotalOrder> {
         ),
       ),
     );
+
+    // อัปเดต totalCost ให้เป็นยอดใหม่เสมอ (ไม่บวกเพิ่ม)
+    totalCost = calculatedCost;
 
     return details;
   }

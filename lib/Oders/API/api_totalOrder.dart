@@ -42,70 +42,11 @@ class ApiPost {
       print(resApi);
       print(resApi.statusCode);
       if (resApi.statusCode == 200) {
-        // final data = json.decode(resApi.data);
-        // await APICartSet.sendCartOk(
-        //   "${data['device_id']}",
-        //   [
-        //     {
-        //       "product_id": 101,
-        //       "quantity": 2,
-        //       "price": 99.0,
-        //     },
-        //     {
-        //       "product_id": 102,
-        //       "quantity": 1,
-        //       "price": 199.0,
-        //     },
-        //   ],
-        // );
-        // deleteCart();
-        // if (data['status'] == 'success') {
-        //   status.status = true;
-        // } else {
-        //   status.status = false;
-        // }
         status.messageJson = resApi.data;
         status.status = true;
       } else {
         status.messageJson = resApi.data;
       }
-      // final response = await http.post(
-      //   Uri.parse("$endpoint/api/member/update_location"),
-      //   headers: {
-      //     'Authorization': 'Bearer $token',
-      //     'Content-Type': 'application/json; charset=UTF-8',
-      //   },
-      //   body: jsonEncode({
-      //     "latitude": lat,
-      //     "longitude": lng,
-      //   }),
-      // );
-      // print(response.body);
-      // if (response.statusCode == 200) {
-      //   final data = json.decode(response.body);
-      //   await APICartSet.sendCartOk(
-      //     "${data['device_id']}",
-      //     [
-      //       {
-      //         "product_id": 101,
-      //         "quantity": 2,
-      //         "price": 99.0,
-      //       },
-      //       {
-      //         "product_id": 102,
-      //         "quantity": 1,
-      //         "price": 199.0,
-      //       },
-      //     ],
-      //   );
-      //   deleteCart();
-      //   if (data['status'] == 'success') {
-      //     return true;
-      //   }
-      // } else {
-      //   print("Error: ${response.statusCode}");
-      // }
-      // return status;
     } catch (e) {
       print("Exception: $e");
       status.messageJson = {"error": e};

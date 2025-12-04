@@ -9,23 +9,20 @@ import 'package:my_flutter_mapwash/Payment/PaymentFail.dart';
 import 'package:my_flutter_mapwash/Payment/PaymentSuccess.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:intl/intl.dart' as intl;
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:my_flutter_mapwash/Status/API/api_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
 
 class Qrcode extends StatefulWidget {
   @override
   _QrcodeState createState() => _QrcodeState();
 }
 
-
-
 class _QrcodeState extends State<Qrcode> {
+  String phone = '';
   String displayMessageStatus = "กำลังดำเนินการ";
   String urlLink = "";
   String idWorking = "";
-  String amount = "";
   String detail = "";
   String username = "";
   String image = "";
@@ -37,6 +34,7 @@ class _QrcodeState extends State<Qrcode> {
   String promotionPrice = "";
   String refID = "";
   String ID = "";
+  String device_id = "";
   int _remainingSeconds = 29 * 60;
   List<Map<String, dynamic>> addressuser = [];
   List<Map<String, dynamic>> Branch = [];
@@ -44,11 +42,31 @@ class _QrcodeState extends State<Qrcode> {
   String payment = '';
   List<Map<String, dynamic>> Conferm_Oder = [];
   List<Map<String, dynamic>> jsonData = [];
+  List<dynamic> _statusData = [];
+  int inNumber = 0;
+
+  String? qrImage;
+  // String orderId = ""; // 👈 เปลี่ยนได้
+  double amount = 1.0; // 👈 ระบุจำนวนเงิน
+  String apiKey = "DRIVER"; // 👈 ใส่ API KEY จริงของคุณ
+  bool isCheck = false;
+  String? paymentStatus;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    amount = args['totalPrice'];
+  }
 
   @override
   void initState() {
     super.initState();
+    getPhone();
     _startCountdown();
+    loadStatus();
+    loadPhone();
   }
 
   void _startCountdown() {
@@ -73,24 +91,88 @@ class _QrcodeState extends State<Qrcode> {
     super.dispose();
   }
 
-  String _generateRandomString(int length) {
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    const digits = '0123456789';
-    Random rand = Random();
-    String randomString = '';
-    for (int i = 0; i < length; i++) {
-      if (i % 2 == 0) {
-        randomString += letters[rand.nextInt(letters.length)];
-      } else {
-        randomString += digits[rand.nextInt(digits.length)];
-      }
+  Future<void> generateQR(orderId) async {
+    final url =
+        "https://payment.washlover.com/create-payment-qr?amount=$amount&order_id=$orderId&ref4=$apiKey";
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        qrImage = data["image2"];
+        paymentStatus = "กรุณาสแกนเพื่อชำระเงิน";
+      });
+    } else {
+      setState(() {
+        paymentStatus = "สร้าง QR ไม่สำเร็จ";
+      });
     }
-    return randomString;
   }
 
-  Future<String?> GetSPFID() async {
+  /// 2) เช็คสถานะการชำระเงิน
+  Future<void> checkPaymentStatus(orderId) async {
+    final url =
+        "https://payment.washlover.com/api/check-payment?ref1=$orderId&ref4=$apiKey";
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data["data"]["status"] == "success") {
+        setState(() {
+          paymentStatus = "🎉 ชำระเงินเรียบร้อยแล้ว";
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainLayout(),
+            ),
+            (Route<dynamic> route) => false, // 🔥 ลบทุกหน้าเก่าทิ้งทั้งหมด
+          );
+        });
+      } else {
+        setState(() {
+          paymentStatus = "${data["data"]["msg"]}" ?? "รอการชำระเงิน";
+        });
+      }
+    } else {
+      setState(() {
+        paymentStatus = "เช็คสถานะไม่สำเร็จ";
+      });
+    }
+  }
+
+  Future<void> loadStatus() async {
+    String orderId = '';
+    try {
+      List<dynamic> data = await api_status.fetchstatus();
+      final filtered = data.where((e) => e['status'] == 1).toList();
+      setState(() {
+        _statusData = filtered;
+        inNumber = _statusData[0]['status'] ?? 0;
+        device_id = _statusData[0]['device_id'] ?? '';
+        orderId = _statusData[0]['device_id'] ?? '';
+      });
+      if (_statusData.isNotEmpty) {
+        setState(() {});
+        if (isCheck == false) {
+          generateQR(orderId);
+        }
+        isCheck = true;
+        checkPaymentStatus(orderId);
+      } else {
+        generateQR(orderId);
+      }
+    } catch (e) {
+      print('Error loading status: $e');
+      setState(() => _statusData = []);
+    }
+  }
+
+  Future<String?> getPhone() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('SPFID');
+    return prefs.getString('phone');
+  }
+
+  void loadPhone() async {
+    phone = await getPhone() ?? '';
   }
 
   String _formatTime(int seconds) {
@@ -108,86 +190,107 @@ class _QrcodeState extends State<Qrcode> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(color: Colors.black12, blurRadius: 10),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Payment Details (#WASH112)",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    Icon(Icons.share, color: Colors.pink),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black12, blurRadius: 10),
                   ],
                 ),
-                SizedBox(height: 4),
-                Text("$formattedDate", style: TextStyle(color: Colors.grey)),
-                Divider(),
-                buildInfoRow(
-                    "ยูเซอร์", "0987654321", "สถานะ", "กำลังดำเนินการ"),
-                buildInfoRow2("เลขอ้างอิง", "wash876fgtgrk4", "จะหมดเวลา",
-                    "${_formatTime(_remainingSeconds)} น."),
-                buildInfoRow(
-                    "รหัสงาน", "#WASH112", "เวลา", "$formattedTime น."),
-                Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("จำนวนเงิน:",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text("฿ 200.00",
-                        style: TextStyle(
+                    // ------- เนื้อหาเดิมทั้งหมดของคุณ -------
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Payment Details",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Icon(Icons.share, color: Colors.pink),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Text("รหัสงาน: $device_id",
+                        style: TextStyle(color: Colors.grey)),
+                    Divider(),
+                    buildInfoRow(
+                        "ยูเซอร์", "$phone", "สถานะ", "$paymentStatus"),
+                    buildInfoRow2("วันที่", "$formattedDate", "จะหมดเวลา",
+                        "${_formatTime(_remainingSeconds)} น."),
+                    buildInfoRow3("หมายเลขอ้างอิง", "$device_id"),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "จำนวนเงิน:",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "฿ $amount",
+                          style: TextStyle(
                             fontSize: 18,
                             color: Colors.red,
-                            fontWeight: FontWeight.bold)),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    qrImage == null
+                        ? Text("กำลังสร้าง QRCODE...")
+                        : Image.network(qrImage!, width: 450, height: 450),
+                    SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "คำเตือน : สามารถสแกน QRCODE ได้เพียงครั้งเดียว ห้ามนำกลับมาใช้ซ้ำเด็ดขาด",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        buildButtonCancle(
+                            "ยกเลิก", Colors.grey, Colors.black, context),
+                        buildButtonSuccess(
+                            "โอนสำเร็จ", Colors.lightGreen, Colors.white),
+                      ],
+                    ),
                   ],
                 ),
-                SizedBox(height: 16),
-                Image.network(
-                  image.isNotEmpty
-                      ? image
-                      : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR41ht1YjdRUgJ5-jhE-ngXzsDARHIuc3JasMHFCvndLApKv12_kRc9yHBm0Mtz5-MPN3U&usqp=CAU',
-                  // width: 300,
-                  // height: 250,
-                  fit: BoxFit.contain,
-                ),
-                SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "คำเตือน : สามารถสแกน QRCODE ได้เพียงครั้งเดียว ห้ามนำกลับมาใช้ซ้ำเด็ดขาด",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    buildButtonCancle(
-                        "ยกเลิก", Colors.grey, Colors.black, context),
-                    buildButtonSuccess(
-                        "โอนสำเร็จ", Colors.lightGreen, Colors.white),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildInfoRow3(String label1, String value1) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          buildInfoColumn(label1, value1),
+        ],
       ),
     );
   }
@@ -252,7 +355,13 @@ class _QrcodeState extends State<Qrcode> {
         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
       onPressed: () {
-        Navigator.pop(context);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MainLayout(),
+          ),
+          (Route<dynamic> route) => false, // 🔥 ลบทุกหน้าเก่าทิ้งทั้งหมด
+        );
       },
       child: Text(text, style: TextStyle(color: textColor)),
     );
@@ -266,37 +375,17 @@ class _QrcodeState extends State<Qrcode> {
         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
       onPressed: () {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MainLayout(),
-          ),
-          (Route<dynamic> route) => false, // 🔥 ลบทุกหน้าเก่าทิ้งทั้งหมด
-        );
+        loadStatus();
+        // checkPaymentStatus();
+        // Navigator.pushAndRemoveUntil(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => MainLayout(),
+        //   ),
+        //   (Route<dynamic> route) => false, // 🔥 ลบทุกหน้าเก่าทิ้งทั้งหมด
+        // );
       },
       child: Text(text, style: TextStyle(color: textColor)),
-    );
-  }
-
-  // ฟังก์ชันที่ใช้แสดงการแจ้งเตือน
-
-  void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('รอดำเนินการ...'),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // ปิดการแจ้งเตือน
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

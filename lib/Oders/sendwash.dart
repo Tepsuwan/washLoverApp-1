@@ -29,7 +29,7 @@ class _sendwashState extends State<sendwash> {
     'clothingType': '',
     'detergent': {},
     'softener': {},
-    'washingMachine': '',
+    'washing': '',
     'temperature': '',
     'dryer': '',
     'note': '',
@@ -287,8 +287,8 @@ class _sendwashState extends State<sendwash> {
                   setState(() {
                     selectedOptions['clothingType'] = item['value'];
                   });
-                  List<Map<String, dynamic>> items = [item];
-                  APICartSet.sendCartToSet(items);
+                  // List<Map<String, dynamic>> items = [item];
+                  // APICartSet.sendCartToSet(items);
                 },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -504,7 +504,7 @@ class _sendwashState extends State<sendwash> {
         .where((item) => item['type'] == apiType)
         .map((item) => Map<String, dynamic>.from(item))
         .toList();
-    if (options.isEmpty) {
+    // if (options.isEmpty) {
       if (apiType == 'washing') {
         options = washingOptions;
       } else if (apiType == 'dryer') {
@@ -512,7 +512,7 @@ class _sendwashState extends State<sendwash> {
       } else if (apiType == 'temperature') {
         options = temperatureOptions;
       }
-    }
+    // }
     return GridView.builder(
       padding: EdgeInsets.all(10),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -532,8 +532,8 @@ class _sendwashState extends State<sendwash> {
               selectedOptions[key] = item['id'];
               selectedItems[item['id']] = item;
             });
-            List<Map<String, dynamic>> items = [item];
-            APICartSet.sendCartToSet(items);
+            // List<Map<String, dynamic>> items = [item];
+            // APICartSet.sendCartToSet(items);
           },
           child: Container(
             decoration: BoxDecoration(
@@ -608,8 +608,8 @@ class _sendwashState extends State<sendwash> {
               setState(() {
                 selectedOptions['note'] = value;
               });
-              List<Map<String, dynamic>> items = [selectedOptions];
-              APICartSet.sendCartToSet(items);
+              // List<Map<String, dynamic>> items = [selectedOptions];
+              // APICartSet.sendCartToSet(items);
             },
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -695,7 +695,7 @@ class _sendwashState extends State<sendwash> {
                 if (selectedOptions['clothingType'] != 2) ...[
                   _buildDetergentSoftenerList('detergent', 'detergent'),
                   _buildDetergentSoftenerList('softener', 'softener'),
-                  _buildOptionList('washing', 'washingMachine'),
+                  _buildOptionList('washing', 'washing'),
                   _buildOptionList('temperature', 'temperature'),
                   _buildOptionList('dryer', 'dryer'),
                   _buildNote(),
