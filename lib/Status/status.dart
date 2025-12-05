@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_flutter_mapwash/Chat/test.dart';
+import 'package:my_flutter_mapwash/Payment/walletQrcode.dart';
 import 'package:my_flutter_mapwash/Status/API/api_status.dart';
 import 'package:my_flutter_mapwash/Status/realtime_status.dart';
 
@@ -115,19 +116,38 @@ class _StatusState extends State<Status> {
   }) {
     return GestureDetector(
       onTap: () {
+        double totalPrice = double.parse(amount);
         _timer?.cancel();
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => realtime_status(
-              id: id,
-              deviceId: device_id,
+        if (status != 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Qrcode(),
+              settings: RouteSettings(
+                arguments: {
+                  'totalPrice': totalPrice,
+                  'address': 'ไม่พบที่อยู่',
+                  'addressBranch': 'ไม่พบสาขาที่ใกล้ที่สุด',
+                  'coupon': '',
+                  'payment': 'manual',
+                },
+              ),
             ),
-          ),
-        ).then((_) {
-          _startAutoRefresh();
-        });
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => realtime_status(
+                id: id,
+                deviceId: device_id,
+              ),
+            ),
+          ).then((_) {
+            _startAutoRefresh();
+          });
+        }
       },
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -137,16 +157,32 @@ class _StatusState extends State<Status> {
             child: Icon(icon, color: color),
           ),
           title: Text(title, style: const TextStyle(fontSize: 14)),
-          subtitle: Text(
-            subtitle,
-            style: const TextStyle(fontSize: 13, color: Colors.grey),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                subtitle,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  "ชำระเงินเรียบร้อยแล้ว",
+                  style: const TextStyle(fontSize: 12, color: Colors.white),
+                ),
+              ),
+            ],
           ),
 
           // ✅ เพิ่มไอคอน chat ที่ฝั่งขวา
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // จำนวนเงินและเวลา
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -166,7 +202,6 @@ class _StatusState extends State<Status> {
                 ],
               ),
               const SizedBox(width: 8),
-              // ปุ่มไอคอนแชต
               if (status != 1)
                 IconButton(
                   icon: const Icon(Icons.chat, color: Colors.blueAccent),
@@ -231,7 +266,6 @@ class _StatusState extends State<Status> {
                 itemCount: _statusData.length,
                 itemBuilder: (context, index) {
                   final order = _statusData[index];
-                  // print(order);
                   final orderStatus =
                       int.tryParse(order['status']?.toString() ?? '0') ?? 0;
                   if (orderStatus == 4) return const SizedBox.shrink();
@@ -255,19 +289,25 @@ class _StatusState extends State<Status> {
                         apiText = statusFromApi['text'];
                         apiColor = statusFromApi['color'];
                       }
+                      bool isUnpaid = orderStatus == 1;
 
-                      return _buildTransactionItem(
-                        context: context,
-                        icon: Icons.online_prediction_sharp,
-                        color: apiColor,
-                        title: '$apiText', // ${order['device_id']}
-                        subtitle: formatDate(order['set_at'] ?? ''),
-                        amount:
-                            '฿${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
-                        time: formatTime(order['set_at'] ?? ''),
-                        id: orderId,
-                        device_id: deviceId,
-                        status: status,
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          _buildTransactionItem(
+                            context: context,
+                            icon: Icons.online_prediction_sharp,
+                            color: apiColor,
+                            title: '$apiText',
+                            subtitle: formatDate(order['set_at'] ?? ''),
+                            amount:
+                                '${price < 0 ? 0.0 : price.toStringAsFixed(2)}',
+                            time: formatTime(order['set_at'] ?? ''),
+                            id: orderId,
+                            device_id: deviceId,
+                            status: status,
+                          ),
+                        ],
                       );
                     },
                   );
