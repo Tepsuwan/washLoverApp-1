@@ -110,7 +110,9 @@ class _QrcodeState extends State<Qrcode> {
   }
 
   /// 2) เช็คสถานะการชำระเงิน
-  Future<void> checkPaymentStatus(orderId) async {
+  Future<void> checkPaymentStatus(
+    orderId,
+  ) async {
     final url =
         "https://payment.washlover.com/api/check-payment?ref1=$orderId&ref4=$apiKey";
     final response = await http.get(Uri.parse(url));
@@ -289,7 +291,7 @@ class _QrcodeState extends State<Qrcode> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          buildInfoColumn(label1, value1),
+          buildInfoColumn3(label1, value1),
         ],
       ),
     );
@@ -342,6 +344,19 @@ class _QrcodeState extends State<Qrcode> {
         Text(label, style: TextStyle(color: Colors.grey)),
         Text(value,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget buildInfoColumn3(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: Colors.grey)),
+        Text(value,
+            style: TextStyle(
+              fontSize: 14,
+            )),
       ],
     );
   }
