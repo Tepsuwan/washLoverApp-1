@@ -118,8 +118,9 @@ class _StatusState extends State<Status> {
       onTap: () {
         double totalPrice = double.parse(amount);
         _timer?.cancel();
-
-        if (status != 1) {
+        print('totalPrice: $totalPrice');
+        print('status: $status');
+        if (status == 1) {
           Navigator.push(
             context,
             MaterialPageRoute(
