@@ -35,7 +35,7 @@ class _QrcodeState extends State<Qrcode> {
   String refID = "";
   String ID = "";
   String device_id = "";
-  int _remainingSeconds = 29 * 60;
+  int _remainingSeconds = 05 * 60;
   List<Map<String, dynamic>> addressuser = [];
   List<Map<String, dynamic>> Branch = [];
   late Timer _timer;
